@@ -1,26 +1,37 @@
-use crate::GameState;
-use crate::loading::TextureAssets;
 use avian2d::prelude::*;
+use bevy::ecs::component::HookContext;
+use bevy::ecs::world::DeferredWorld;
 use bevy::prelude::*;
 use bevy_enhanced_input::prelude::*;
 
-const PLAYER_SPEED: f32 = 200.;
+use crate::{GameState, world};
+
+const PLAYER_SPEED: f32 = 100.;
 
 pub struct PlayerPlugin;
 
 impl Plugin for PlayerPlugin {
     fn build(&self, app: &mut App) {
-        app.add_systems(OnEnter(GameState::Playing), spawn_player)
-            .add_input_context::<PlayerContext>()
+        app.add_input_context::<PlayerContext>()
+            .register_required_components::<world::PlayerVessel, Player>()
             .add_observer(bind)
             .add_observer(apply_movement)
             .add_observer(stop_movement);
     }
 }
 
-#[derive(Component)]
-#[require(RigidBody::Kinematic)]
+#[derive(Default, Component)]
+#[require(RigidBody::Kinematic, Actions<PlayerContext>)]
+#[component(on_insert = Self::bind_camera)]
 pub struct Player;
+
+impl Player {
+    fn bind_camera(mut world: DeferredWorld, _: HookContext) {
+        world
+            .commands()
+            .run_system_cached(bevy_optix::camera::bind_camera::<Player>);
+    }
+}
 
 #[derive(InputContext)]
 pub struct PlayerContext;
@@ -41,15 +52,6 @@ fn bind(trigger: Trigger<Binding<PlayerContext>>, mut actions: Query<&mut Action
     ));
 }
 
-fn spawn_player(mut commands: Commands, textures: Res<TextureAssets>) {
-    commands.spawn((
-        Sprite::from_image(textures.bevy.clone()),
-        Transform::from_translation(Vec3::new(0., 0., 1.)),
-        Actions::<PlayerContext>::default(),
-        Player,
-    ));
-}
-
 #[derive(Default, Component)]
 pub struct BlockControls;
 
@@ -65,7 +67,13 @@ fn apply_movement(
 
 fn stop_movement(
     _: Trigger<Completed<MoveAction>>,
-    mut velocity: Single<&mut LinearVelocity, (With<Player>, Without<BlockControls>)>,
+    player: Single<(&mut LinearVelocity, &mut Transform), (With<Player>, Without<BlockControls>)>,
 ) {
+    let (mut velocity, mut transform) = player.into_inner();
     velocity.0 = Vec2::default();
+    transform.translation = transform
+        .translation
+        .xy()
+        .round()
+        .extend(transform.translation.z)
 }

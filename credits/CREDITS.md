@@ -2,4 +2,4 @@
 
 ## Assets
 
-* Bevy icon: [MIT License](licenses/Bevy_MIT_License.md);
+- https://assetbakery.itch.io/horror-house-tileset

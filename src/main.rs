@@ -20,10 +20,11 @@ use crate::player::PlayerPlugin;
 mod loading;
 mod menu;
 mod player;
+mod world;
 
-pub const WIDTH: f32 = 640.;
-pub const HEIGHT: f32 = 360.;
-pub const RESOLUTION_SCALE: f32 = 2.;
+pub const WIDTH: f32 = 320.;
+pub const HEIGHT: f32 = 180.;
+pub const RESOLUTION_SCALE: f32 = 4.;
 
 fn main() {
     let mut app = App::new();
@@ -31,48 +32,57 @@ fn main() {
     #[cfg(debug_assertions)]
     app.add_systems(Update, close_on_escape);
 
-    app.insert_resource(ClearColor(Color::linear_rgb(0.4, 0.4, 0.4)))
-        .add_plugins((
-            DefaultPlugins
-                .set(WindowPlugin {
-                    primary_window: Some(Window {
-                        // TODO: Rename
-                        title: "Time Marches On".to_string(),
-                        canvas: Some("#bevy".to_owned()),
-                        fit_canvas_to_parent: true,
-                        prevent_default_event_handling: false,
-                        resolution: WindowResolution::new(
-                            WIDTH * RESOLUTION_SCALE,
-                            HEIGHT * RESOLUTION_SCALE,
-                        ),
-                        ..default()
-                    }),
-                    ..default()
-                })
-                .set(AssetPlugin {
-                    meta_check: AssetMetaCheck::Never,
+    #[cfg(not(debug_assertions))]
+    app.insert_resource(ClearColor(Color::BLACK));
+
+    #[cfg(debug_assertions)]
+    app.insert_resource(ClearColor(Color::linear_rgb(1., 0., 1.)));
+
+    app.add_plugins((
+        DefaultPlugins
+            .set(WindowPlugin {
+                primary_window: Some(Window {
+                    // TODO: Rename
+                    title: "Time Marches On".to_string(),
+                    canvas: Some("#bevy".to_owned()),
+                    fit_canvas_to_parent: true,
+                    prevent_default_event_handling: false,
+                    resolution: WindowResolution::new(
+                        WIDTH * RESOLUTION_SCALE,
+                        HEIGHT * RESOLUTION_SCALE,
+                    ),
                     ..default()
                 }),
-            bevy_tween::DefaultTweenPlugins,
-            //bevy_seedling::SeedlingPlugin {
-            //    ..Default::default()
-            //},
-            bevy_enhanced_input::EnhancedInputPlugin,
-            //avian2d::debug_render::PhysicsDebugPlugin::new(Avian),
-            avian2d::PhysicsPlugins::new(Avian).with_length_unit(8.),
-            bevy_optix::pixel_perfect::PixelPerfectPlugin(CanvasDimensions {
-                width: WIDTH as u32,
-                height: HEIGHT as u32,
-                pixel_scale: RESOLUTION_SCALE,
+                ..default()
+            })
+            .set(AssetPlugin {
+                meta_check: AssetMetaCheck::Never,
+                ..default()
             }),
-            bevy_optix::debug::DebugPlugin,
-            bevy_pretty_text::PrettyTextPlugin,
-        ))
-        .add_plugins((LoadingPlugin, MenuPlugin, PlayerPlugin))
-        .init_state::<GameState>()
-        .init_schedule(Avian)
-        .insert_resource(Gravity(Vec2::ZERO))
-        .add_systems(Startup, set_window_icon);
+        bevy_tween::DefaultTweenPlugins,
+        //bevy_seedling::SeedlingPlugin {
+        //    ..Default::default()
+        //},
+        bevy_enhanced_input::EnhancedInputPlugin,
+        //avian2d::debug_render::PhysicsDebugPlugin::new(Avian),
+        avian2d::PhysicsPlugins::new(Avian).with_length_unit(8.),
+        bevy_optix::pixel_perfect::PixelPerfectPlugin(CanvasDimensions {
+            width: WIDTH as u32,
+            height: HEIGHT as u32,
+            pixel_scale: RESOLUTION_SCALE,
+        }),
+        bevy_optix::debug::DebugPlugin,
+        bevy_optix::camera::CameraAnimationPlugin,
+        bevy_pretty_text::PrettyTextPlugin,
+        bevy_ldtk_scene::LdtkScenePlugin,
+        world::TimeMarchesOnPlugin,
+    ))
+    .add_plugins((LoadingPlugin, MenuPlugin, PlayerPlugin))
+    .init_state::<GameState>()
+    .init_schedule(Avian)
+    .insert_resource(Gravity(Vec2::ZERO))
+    .add_systems(Startup, set_window_icon)
+    .add_systems(OnEnter(GameState::Playing), load_ldtk);
 
     app.world_mut()
         .resource_mut::<FixedMainScheduleOrder>()
@@ -96,6 +106,14 @@ pub struct Avian;
 pub enum Layer {
     #[default]
     Default,
+}
+
+fn load_ldtk(mut commands: Commands, server: Res<AssetServer>) {
+    commands.spawn((
+        bevy_ldtk_scene::HotWorld(server.load("ldtk/time-marches-on.ldtk")),
+        bevy_ldtk_scene::World(server.load("ldtk/time-marches-on.ron")),
+        bevy_ldtk_scene::prelude::LevelLoader::levels(world::Level0),
+    ));
 }
 
 // Sets the icon on windows and X11

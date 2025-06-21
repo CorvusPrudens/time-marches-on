@@ -69,9 +69,11 @@ bevy = { version = "0.16", default-features = false, features = [
   "tonemapping_luts",
   "webgl2",
   "x11",
+  "file_watcher",
 ] }
 bevy_optix = { path = "bevy_optix" }
 bevy_pretty_text = { path = "bevy_pretty_text" }
+bevy_ldtk_scene = { path = "bevy_ldtk_scene" }
 # bevy_sequence = { path = "bevy_sequence" }
 bevy_seedling = { path = "bevy_seedling" }
 webbrowser = { version = "1", features = ["hardened"] }
@@ -89,6 +91,8 @@ avian2d = "0.3"
 bevy_asset_loader = { version = "0.23.0" }
 bevy_tween = "0.8.0"
 bevy_enhanced_input = "0.11"
+serde = "1.0.219"
 
 [build-dependencies]
 embed-resource = "1"
+bevy_ldtk_scene = { path = "bevy_ldtk_scene" }

@@ -6,9 +6,15 @@ pub struct LoadingPlugin;
 
 impl Plugin for LoadingPlugin {
     fn build(&self, app: &mut App) {
+        #[cfg(not(debug_assertions))]
+        let cont = GameState::Menu;
+
+        #[cfg(debug_assertions)]
+        let cont = GameState::Playing;
+
         app.add_loading_state(
             LoadingState::new(GameState::Loading)
-                .continue_to_state(GameState::Menu)
+                .continue_to_state(cont)
                 .load_collection::<TextureAssets>(),
         );
     }

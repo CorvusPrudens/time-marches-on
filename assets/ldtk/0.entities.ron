@@ -1,0 +1,30 @@
+([
+    (
+        uid: (6),
+        instance: ("f3c8c4e0-3740-11f0-9dbe-a95d67c13060"),
+        xyz: (192.0, -48.0, 2.0),
+        sprite: Some((
+            image: "ldtk/../textures/horror-house.png",
+            tileset: (1),
+            atlas: Rect((
+                min: (224.0, 0.0),
+                max: (256.0, 48.0),
+            )),
+        )),
+        worldly: false,
+    ),
+    (
+        uid: (7),
+        instance: ("a2813ec0-3740-11f0-9dbe-b1d943162ef9"),
+        xyz: (128.0, -128.0, 2.0),
+        sprite: Some((
+            image: "ldtk/../textures/horror-house.png",
+            tileset: (1),
+            atlas: Rect((
+                min: (48.0, 32.0),
+                max: (64.0, 48.0),
+            )),
+        )),
+        worldly: false,
+    ),
+])

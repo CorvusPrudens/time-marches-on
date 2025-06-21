@@ -10,3 +10,6 @@
 [submodule "bevy_pretty_text"]
 	path = bevy_pretty_text
 	url = https://github.com/void-scape/bevy_pretty_text
+[submodule "bevy_ldtk_scene"]
+	path = bevy_ldtk_scene
+	url = https://github.com/void-scape/bevy_ldtk_scene.git
