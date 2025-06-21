@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+    <dict>
+        <key>CFBundleDevelopmentRegion</key>
+        <string>en</string>
+        <key>CFBundleDisplayName</key>
+
+        <!-- TODO: This should be the same as your OSX app name in the release flow -->
+        <string>BevyTemplate</string> 
+        <key>CFBundleExecutable</key>
+
+        <!-- TODO: This should be the same as your executable name in the release flow -->
+        <string>bevy_template</string> 
+        <key>CFBundleIconFile</key>
+        <string>AppIcon.icns</string>
+        <key>CFBundleIdentifier</key>
+
+        <!-- TODO: Rename -->
+        <string>your.domain.bevy-game</string> 
+        <key>CFBundleInfoDictionaryVersion</key>
+        <string>6.0</string>
+        <key>CFBundleName</key>
+
+        <!-- TODO: Rename -->
+        <string>Bevy Template</string> 
+        <key>CFBundlePackageType</key>
+        <string>APPL</string>
+        <key>CFBundleShortVersionString</key>
+
+        <!-- TODO: Version -->
+        <string>0.1.0</string>
+        <key>CFBundleSupportedPlatforms</key>
+        <array>
+            <string>MacOSX</string>
+        </array>
+    </dict>
+</plist>

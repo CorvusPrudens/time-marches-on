@@ -1,0 +1,66 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+
+jobs:
+  test:
+    strategy:
+      matrix:
+        os: [windows-latest, ubuntu-latest, macos-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - name: Install alsa and udev
+        run: sudo apt-get update; sudo apt-get install --no-install-recommends libasound2-dev libudev-dev
+        if: runner.os == 'linux'
+      - name: Submodules
+        run: git submodule update --init --recursive
+      - name: Tests
+        run: cargo test
+
+  wasm-test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      - name: Install rust toolchain
+        uses: dtolnay/rust-toolchain@master
+        with:
+          toolchain: stable
+      - name: Install Dependencies
+        run: sudo apt-get update; sudo apt-get install pkg-config libx11-dev libasound2-dev libudev-dev
+      - name: Add wasm target
+        run: rustup target add wasm32-unknown-unknown
+      - name: Submodules
+        run: git submodule update --init --recursive
+      - name: Build Release
+        run: cargo test
+
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          components: clippy
+      - name: Install alsa and udev
+        run: sudo apt-get update; sudo apt-get install --no-install-recommends libasound2-dev libudev-dev
+        if: runner.os == 'linux'
+      - name: Submodules
+        run: git submodule update --init --recursive
+      - name: Clippy
+        run: |
+          rustup component add clippy 
+          cargo clippy --workspace --all-targets --all-features -- -Dwarnings
+
+  spelling:
+      name: Spelling
+      runs-on: ubuntu-latest
+      steps:
+      - name: Checkout Actions Repository
+        uses: actions/checkout@v4
+      - name: Spell Check Repo
+        uses: crate-ci/typos@v1.32.0
