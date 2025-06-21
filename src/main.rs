@@ -13,15 +13,19 @@ use bevy_optix::pixel_perfect::CanvasDimensions;
 use std::io::Cursor;
 use winit::window::Icon;
 
+<<<<<<< HEAD
 use crate::loading::LoadingPlugin;
 use crate::menu::MenuPlugin;
 use crate::player::PlayerPlugin;
 
 mod fragments;
 mod interactions;
+=======
+>>>>>>> 0c3a9f8614b89e4d39c1a779531ccb418a6ed45a
 mod loading;
 mod menu;
 mod player;
+mod textbox;
 mod world;
 
 pub const WIDTH: f32 = 320.;
@@ -78,9 +82,10 @@ fn main() {
         world::TimeMarchesOnPlugin,
     ))
     .add_plugins((
-        LoadingPlugin,
-        MenuPlugin,
-        PlayerPlugin,
+        loading::LoadingPlugin,
+        menu::MenuPlugin,
+        player::PlayerPlugin,
+        textbox::TextboxPlugin,
         interactions::InteractionPlugin,
     ))
     .init_state::<GameState>()
