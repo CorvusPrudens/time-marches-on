@@ -3,8 +3,9 @@ use bevy::ecs::component::HookContext;
 use bevy::ecs::world::DeferredWorld;
 use bevy::prelude::*;
 use bevy_enhanced_input::prelude::*;
+use bevy_optix::camera::PixelSnap;
 
-use crate::{GameState, world};
+use crate::world;
 
 const PLAYER_SPEED: f32 = 100.;
 
@@ -21,7 +22,7 @@ impl Plugin for PlayerPlugin {
 }
 
 #[derive(Default, Component)]
-#[require(RigidBody::Kinematic, Actions<PlayerContext>)]
+#[require(RigidBody::Kinematic, Actions<PlayerContext>, PixelSnap)]
 #[component(on_insert = Self::bind_camera)]
 pub struct Player;
 
