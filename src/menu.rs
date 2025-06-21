@@ -111,10 +111,10 @@ fn setup_menu(mut commands: Commands, textures: Res<TextureAssets>) {
                         TextColor(Color::linear_rgb(0.9, 0.9, 0.9)),
                     ));
                     parent.spawn((
-                        ImageNode {
-                            image: textures.bevy.clone(),
-                            ..default()
-                        },
+                        //ImageNode {
+                        //    image: textures.bevy.clone(),
+                        //    ..default()
+                        //},
                         Node {
                             width: Val::Px(32.),
                             ..default()
@@ -149,7 +149,7 @@ fn setup_menu(mut commands: Commands, textures: Res<TextureAssets>) {
                         TextColor(Color::linear_rgb(0.9, 0.9, 0.9)),
                     ));
                     parent.spawn((
-                        ImageNode::new(textures.github.clone()),
+                        //ImageNode::new(textures.github.clone()),
                         Node {
                             width: Val::Px(32.),
                             ..default()
