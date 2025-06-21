@@ -33,6 +33,7 @@ opt-level = 1
 inherits = "dev"
 
 [features]
+default = ["dev"]
 dev = ["bevy/dynamic_linking"]
 
 [dependencies]
