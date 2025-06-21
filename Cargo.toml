@@ -47,7 +47,6 @@ bevy = { version = "0.16", default-features = false, features = [
   "bevy_gltf",
   "bevy_log",
   "bevy_mesh_picking_backend",
-  "bevy_pbr",
   "bevy_picking",
   "bevy_render",
   "bevy_scene",
@@ -74,7 +73,7 @@ bevy = { version = "0.16", default-features = false, features = [
 bevy_optix = { path = "bevy_optix" }
 bevy_pretty_text = { path = "bevy_pretty_text" }
 bevy_ldtk_scene = { path = "bevy_ldtk_scene" }
-# bevy_sequence = { path = "bevy_sequence" }
+bevy_sequence = { path = "bevy_sequence" }
 bevy_seedling = { path = "bevy_seedling" }
 webbrowser = { version = "1", features = ["hardened"] }
 rand = "0.8"

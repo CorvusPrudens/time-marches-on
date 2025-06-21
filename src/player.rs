@@ -22,7 +22,7 @@ impl Plugin for PlayerPlugin {
 }
 
 #[derive(Default, Component)]
-#[require(RigidBody::Kinematic, Actions<PlayerContext>, PixelSnap)]
+#[require(RigidBody::Kinematic, Actions<PlayerContext>, PixelSnap, Collider::rectangle(8.0, 16.0))]
 #[component(on_insert = Self::bind_camera)]
 pub struct Player;
 
@@ -41,8 +41,11 @@ pub struct PlayerContext;
 #[input_action(output = Vec2)]
 struct MoveAction;
 
-fn bind(trigger: Trigger<Binding<PlayerContext>>, mut actions: Query<&mut Actions<PlayerContext>>) {
-    let mut actions = actions.get_mut(trigger.target()).unwrap();
+fn bind(
+    trigger: Trigger<Binding<PlayerContext>>,
+    mut actions: Query<&mut Actions<PlayerContext>>,
+) -> Result {
+    let mut actions = actions.get_mut(trigger.target())?;
 
     actions.bind::<MoveAction>().to((
         Cardinal::wasd_keys(),
@@ -51,6 +54,8 @@ fn bind(trigger: Trigger<Binding<PlayerContext>>, mut actions: Query<&mut Action
         Axial::left_stick()
             .with_modifiers_each(DeadZone::new(DeadZoneKind::Radial).with_lower_threshold(0.15)),
     ));
+
+    Ok(())
 }
 
 #[derive(Default, Component)]

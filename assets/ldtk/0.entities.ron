@@ -27,4 +27,11 @@
         )),
         worldly: false,
     ),
+    (
+        uid: (8),
+        instance: ("d26f5fb0-3740-11f0-82aa-a7df5826d617"),
+        xyz: (16.0, -16.0, 2.0),
+        sprite: None,
+        worldly: false,
+    ),
 ])

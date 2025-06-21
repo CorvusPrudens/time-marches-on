@@ -17,6 +17,8 @@ use crate::loading::LoadingPlugin;
 use crate::menu::MenuPlugin;
 use crate::player::PlayerPlugin;
 
+mod fragments;
+mod interactions;
 mod loading;
 mod menu;
 mod player;
@@ -60,11 +62,9 @@ fn main() {
                 ..default()
             }),
         bevy_tween::DefaultTweenPlugins,
-        //bevy_seedling::SeedlingPlugin {
-        //    ..Default::default()
-        //},
+        bevy_seedling::SeedlingPlugin::default(),
         bevy_enhanced_input::EnhancedInputPlugin,
-        //avian2d::debug_render::PhysicsDebugPlugin::new(Avian),
+        avian2d::debug_render::PhysicsDebugPlugin::new(Avian),
         avian2d::PhysicsPlugins::new(Avian).with_length_unit(8.),
         bevy_optix::pixel_perfect::PixelPerfectPlugin(CanvasDimensions {
             width: WIDTH as u32,
@@ -77,7 +77,12 @@ fn main() {
         bevy_ldtk_scene::LdtkScenePlugin,
         world::TimeMarchesOnPlugin,
     ))
-    .add_plugins((LoadingPlugin, MenuPlugin, PlayerPlugin))
+    .add_plugins((
+        LoadingPlugin,
+        MenuPlugin,
+        PlayerPlugin,
+        interactions::InteractionPlugin,
+    ))
     .init_state::<GameState>()
     .init_schedule(Avian)
     .insert_resource(Gravity(Vec2::ZERO))
