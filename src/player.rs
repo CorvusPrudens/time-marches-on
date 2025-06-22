@@ -22,7 +22,13 @@ impl Plugin for PlayerPlugin {
 }
 
 #[derive(Default, Component)]
-#[require(RigidBody::Kinematic, Actions<PlayerContext>, PixelSnap, Collider::rectangle(8.0, 16.0))]
+#[require(
+    RigidBody::Dynamic,
+    LockedAxes::ROTATION_LOCKED,
+    Actions<PlayerContext>,
+    PixelSnap,
+    Collider::rectangle(8.0, 16.0)
+)]
 #[component(on_insert = Self::bind_camera)]
 pub struct Player;
 
