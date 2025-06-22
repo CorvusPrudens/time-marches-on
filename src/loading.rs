@@ -10,7 +10,7 @@ impl Plugin for LoadingPlugin {
         let cont = GameState::Menu;
 
         #[cfg(debug_assertions)]
-        let cont = GameState::Playing;
+        let cont = GameState::Hook;
 
         app.add_loading_state(
             LoadingState::new(GameState::Loading)

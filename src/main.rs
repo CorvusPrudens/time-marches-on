@@ -19,6 +19,7 @@ mod animation;
 mod callback;
 mod entities;
 mod fragments;
+mod hook;
 mod interactions;
 mod inventory;
 mod levels;
@@ -29,9 +30,9 @@ mod textbox;
 #[allow(unused)]
 mod world;
 
-pub const WIDTH: f32 = 280.;
-pub const HEIGHT: f32 = 160.;
-pub const RESOLUTION_SCALE: f32 = 4.;
+pub const WIDTH: f32 = 256.;
+pub const HEIGHT: f32 = 144.;
+pub const RESOLUTION_SCALE: f32 = 5.;
 
 pub const TILE_SIZE: f32 = 16.;
 
@@ -79,6 +80,7 @@ fn main() {
         bevy_pretty_text::PrettyTextPlugin,
         bevy_ldtk_scene::LdtkScenePlugin,
         world::TimeMarchesOnPlugin,
+        bevy_sequence::SequencePlugin,
         //bevy_egui::EguiPlugin {
         //    enable_multipass_for_primary_context: true,
         //},
@@ -94,6 +96,7 @@ fn main() {
         levels::LevelPlugin,
         entities::EntityPlugin,
         animation::AnimationPlugin,
+        hook::HookPlugin,
     ))
     .init_state::<GameState>()
     .add_sub_state::<PlayingState>()
@@ -124,6 +127,7 @@ enum GameState {
     #[default]
     Loading,
     Menu,
+    Hook,
     Playing,
 }
 
@@ -188,8 +192,18 @@ fn close_on_escape(input: Res<ButtonInput<KeyCode>>, mut writer: EventWriter<App
 }
 
 #[cfg(debug_assertions)]
-fn enable_avian_debug(mut store: ResMut<GizmoConfigStore>, input: Res<ButtonInput<KeyCode>>) {
+fn enable_avian_debug(
+    mut store: ResMut<GizmoConfigStore>,
+    input: Res<ButtonInput<KeyCode>>,
+    mut setup: Local<bool>,
+) {
     use avian2d::prelude::PhysicsGizmos;
+
+    if !*setup {
+        let config = store.config_mut::<PhysicsGizmos>().0;
+        config.enabled = false;
+        *setup = true;
+    }
 
     if input.just_pressed(KeyCode::KeyP) {
         let config = store.config_mut::<PhysicsGizmos>().0;

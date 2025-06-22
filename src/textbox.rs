@@ -10,6 +10,7 @@ use bevy_pretty_text::prelude::{GlyphRevealed, Reveal, TypeWriter, TypeWriterFin
 use bevy_seedling::prelude::Volume;
 use bevy_seedling::sample::{PitchRange, SamplePlayer};
 
+use crate::animation::{AnimationAppExt, AnimationSprite};
 use crate::player::{Player, PlayerContext};
 
 pub struct TextboxPlugin;
@@ -17,6 +18,16 @@ pub struct TextboxPlugin;
 impl Plugin for TextboxPlugin {
     fn build(&self, app: &mut App) {
         app.add_input_context::<TextboxContext>()
+            .register_layout(
+                "textures/textbox-await.png",
+                TextureAtlasLayout::from_grid(
+                    UVec2::new(crate::WIDTH as u32, crate::HEIGHT as u32),
+                    4,
+                    1,
+                    None,
+                    None,
+                ),
+            )
             .add_event::<TextboxEvent>()
             .add_event::<TextboxClosedEvent>()
             .init_resource::<GlyphReveal>()
@@ -78,7 +89,7 @@ impl TextBlurb {
                 PitchRange::new(0.02),
                 SamplePlayer {
                     sample: server.load(glyph_sample("low.wav")),
-                    //volume: Volume::Linear(1.),
+                    volume: Volume::Linear(0.5),
                     ..Default::default()
                 },
             ));
@@ -282,13 +293,9 @@ fn pop_next_section(
 #[derive(Component)]
 struct AwaitinputVisual;
 
-fn await_input_visual(
-    trigger: Trigger<OnAdd, AwaitInput>,
-    mut commands: Commands,
-    server: Res<AssetServer>,
-) {
+fn await_input_visual(trigger: Trigger<OnAdd, AwaitInput>, mut commands: Commands) {
     commands.entity(trigger.target()).with_child((
-        Sprite::from_image(server.load("textures/textbox_await.png")),
+        AnimationSprite::repeating("textures/textbox-await.png", 0.2, 0..4),
         Transform::from_xyz(0., 0., -1.).with_scale(Vec3::splat(crate::RESOLUTION_SCALE)),
         HIGH_RES_LAYER,
     ));
