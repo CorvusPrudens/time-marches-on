@@ -18,6 +18,7 @@ impl Plugin for TextboxPlugin {
     fn build(&self, app: &mut App) {
         app.add_input_context::<TextboxContext>()
             .add_event::<TextboxEvent>()
+            .add_event::<TextboxClosedEvent>()
             .init_resource::<GlyphReveal>()
             .add_systems(Update, textbox_event)
             .add_observer(bind)
@@ -51,7 +52,7 @@ impl TextboxEvent {
 #[derive(Clone)]
 pub struct TextBlurb {
     text: Cow<'static, str>,
-    character: CharacterSprite,
+    character: Option<CharacterSprite>,
     glyph: Arc<dyn Fn(&mut Commands, &AssetServer) + Send + Sync>,
 }
 
@@ -60,19 +61,19 @@ impl TextBlurb {
     ///   - character: `textures/characters/`
     pub fn new(
         text: impl Into<Cow<'static, str>>,
-        character: impl AsRef<str>,
+        character: Option<&str>,
         glyph: impl Fn(&mut Commands, &AssetServer) + Send + Sync + 'static,
     ) -> Self {
         Self {
             text: text.into(),
-            character: CharacterSprite::new(character.as_ref()),
+            character: character.map(CharacterSprite::new),
             glyph: Arc::new(glyph),
         }
     }
 
     pub fn narrator(text: impl Into<Cow<'static, str>>) -> Self {
         // lol
-        Self::new(text, "", |commands, server| {
+        Self::new(text, None, |commands, server| {
             commands.spawn((
                 PitchRange::new(0.02),
                 SamplePlayer {
@@ -85,7 +86,7 @@ impl TextBlurb {
     }
 
     pub fn main_character(text: impl Into<Cow<'static, str>>) -> Self {
-        Self::new(text, "main.png", |commands, server| {
+        Self::new(text, Some("main.png"), |commands, server| {
             commands.spawn((
                 PitchRange::new(0.05),
                 SamplePlayer {
@@ -154,6 +155,10 @@ fn bind(
         .with_conditions(JustPress::default());
 }
 
+/// An event emitted when a textbox is closed by the user.
+#[derive(Debug, Event)]
+pub struct TextboxClosedEvent;
+
 #[derive(Component)]
 struct AwaitInput;
 
@@ -163,6 +168,7 @@ fn close_textbox(
     textbox: Single<Entity, With<AwaitInput>>,
     sections: Single<(Entity, &TextboxSections)>,
     player: Single<Entity, With<Player>>,
+    mut writer: EventWriter<TextboxClosedEvent>,
 ) {
     let (entity, sections) = sections.into_inner();
     match sections.0.is_empty() {
@@ -175,6 +181,8 @@ fn close_textbox(
             commands
                 .entity(*player)
                 .insert(Actions::<PlayerContext>::default());
+
+            writer.write(TextboxClosedEvent);
         }
     }
 }
@@ -258,15 +266,17 @@ fn pop_next_section(
     text.0.extend(section.text.chars());
     commands.entity(text_entity).insert(TypeWriter::cps(30.));
 
-    commands
-        .entity(*textbox)
-        .remove::<AwaitInput>()
-        .with_child((
+    let mut textbox = commands.entity(*textbox);
+    textbox.remove::<AwaitInput>();
+
+    if let Some(character) = &section.character {
+        textbox.with_child((
             CharacterSpriteEntity,
-            Sprite::from_image(server.load(&section.character.0)),
+            Sprite::from_image(server.load(&character.0)),
             Transform::from_xyz(0., 0., -3.).with_scale(Vec3::splat(crate::RESOLUTION_SCALE)),
             HIGH_RES_LAYER,
         ));
+    }
 }
 
 #[derive(Component)]

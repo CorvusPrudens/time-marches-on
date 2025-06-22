@@ -11,8 +11,9 @@ use bevy::{
     render::camera::NormalizedRenderTarget,
 };
 use bevy_enhanced_input::prelude::*;
+use bevy_seedling::{prelude::Volume, sample::SamplePlayer};
 
-use crate::PlayingState;
+use crate::{PlayingState, textbox::glyph_sample};
 
 #[derive(InputContext)]
 pub struct InventoryContext;
@@ -75,6 +76,8 @@ pub fn bind(
 pub fn navigate(
     trigger: Trigger<Fired<MenuMoveAction>>,
     mut directional_navigation: DirectionalNavigation,
+    mut commands: Commands,
+    server: Res<AssetServer>,
 ) {
     let net_east_west = if trigger.value.x == 0.0 {
         0
@@ -104,12 +107,15 @@ pub fn navigate(
 
     if let Some(direction) = maybe_direction {
         match directional_navigation.navigate(direction) {
-            // In a real game, you would likely want to play a sound or show a visual effect
-            // on both successful and unsuccessful navigation attempts
-            Ok(entity) => {
-                println!("Navigated {direction:?} successfully. {entity} is now focused.");
+            Ok(_) => {
+                commands.spawn(
+                    SamplePlayer::new(server.load(glyph_sample("medium.wav")))
+                        .with_volume(Volume::Decibels(-6.0)),
+                );
             }
-            Err(e) => println!("Navigation failed: {e}"),
+            Err(e) => {
+                debug!("nowhere to navigate: {e}");
+            }
         }
     }
 }

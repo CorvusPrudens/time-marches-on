@@ -1,11 +1,24 @@
+use std::time::Duration;
+
 use avian2d::prelude::*;
+use bevy::ecs::component::HookContext;
+use bevy::ecs::world::DeferredWorld;
 use bevy::platform::collections::HashMap;
 use bevy::prelude::*;
 use bevy_enhanced_input::events::Fired;
+use bevy_enhanced_input::prelude::Actions;
 use bevy_optix::camera::MainCamera;
+use bevy_optix::pixel_perfect::HIGH_RES_LAYER;
+use bevy_seedling::prelude::Volume;
+use bevy_seedling::sample::SamplePlayer;
+use bevy_tween::combinator::{sequence, tween};
+use bevy_tween::interpolate::sprite_color_to;
+use bevy_tween::prelude::{AnimationBuilderExt, EaseKind};
+use bevy_tween::tween::IntoTarget;
 
+use crate::callback::Callback;
 use crate::interactions::InteractAction;
-use crate::player::Player;
+use crate::player::{Player, PlayerContext};
 use crate::textbox::{TextBlurb, TextboxEvent};
 use crate::{GameState, HexColor, Layer, TILE_SIZE, world};
 
@@ -17,7 +30,7 @@ impl Plugin for LevelPlugin {
             .register_required_components::<world::Door, Door>()
             .register_required_components::<world::SideDoor1, Door>()
             .register_required_components::<world::SideDoor2, Door>()
-            .add_systems(Update, add_tile_collision)
+            .add_systems(Update, (add_tile_collision, manage_transitions))
             .add_systems(OnEnter(GameState::Playing), load_ldtk)
             .add_observer(teleport)
             .add_observer(door);
@@ -52,6 +65,115 @@ fn teleport(
     transform.translation.x += diff;
 }
 
+#[derive(Default)]
+enum TransitionStage {
+    #[default]
+    In,
+    Out,
+}
+
+#[derive(Component)]
+#[component(on_remove = Self::on_remove_hook, on_insert = Self::on_insert_hook)]
+struct ScreenTransition {
+    duration: Duration,
+    timer: Timer,
+    stage: TransitionStage,
+    on_black: Callback,
+    on_complete: Callback,
+}
+
+impl ScreenTransition {
+    pub fn new<S1, M1, S2, M2>(duration: Duration, on_black: S1, on_complete: S2) -> Self
+    where
+        S1: IntoSystem<(), (), M1> + Send + Sync + 'static,
+        M1: 'static,
+        S2: IntoSystem<(), (), M2> + Send + Sync + 'static,
+        M2: 'static,
+    {
+        Self {
+            duration,
+            timer: Timer::new(duration, TimerMode::Once),
+            stage: TransitionStage::In,
+            on_black: Callback::new(on_black),
+            on_complete: Callback::new(on_complete),
+        }
+    }
+
+    fn on_insert_hook(mut world: DeferredWorld, context: HookContext) {
+        let duration = world.get::<Self>(context.entity).unwrap().duration;
+        let mut commands = world.commands();
+        let mut entity = commands.entity(context.entity);
+
+        entity.insert((
+            HIGH_RES_LAYER,
+            Sprite::from_color(Color::NONE, Vec2::new(crate::WIDTH, crate::HEIGHT)),
+            Transform::from_translation(Vec3::new(0.0, 0.0, 999.0))
+                .with_scale(Vec3::splat(crate::RESOLUTION_SCALE)),
+        ));
+
+        let target = entity.id().into_target();
+        let mut color = target.state(Color::NONE);
+
+        entity.animation().insert(sequence((
+            tween(
+                duration,
+                EaseKind::QuadraticOut,
+                color.with(sprite_color_to(Color::BLACK)),
+            ),
+            tween(
+                duration,
+                EaseKind::QuadraticIn,
+                color.with(sprite_color_to(Color::NONE)),
+            ),
+        )));
+    }
+
+    fn on_remove_hook(mut world: DeferredWorld, context: HookContext) {
+        let trans = world.get::<ScreenTransition>(context.entity).unwrap();
+
+        let a = trans.on_black.0.clone();
+        let b = trans.on_complete.0.clone();
+
+        world.commands().queue(move |world: &mut World| -> Result {
+            a.lock().unwrap().unregister(world)?;
+            b.lock().unwrap().unregister(world)?;
+
+            Ok(())
+        });
+    }
+}
+
+fn manage_transitions(
+    mut transitions: Query<(Entity, &mut ScreenTransition)>,
+    mut commands: Commands,
+    time: Res<Time>,
+) {
+    let delta = time.delta();
+
+    for (entity, mut transition) in transitions.iter_mut() {
+        if transition.timer.tick(delta).just_finished() {
+            match transition.stage {
+                TransitionStage::In => {
+                    let on_black = transition.on_black.0.clone();
+                    commands
+                        .queue(move |world: &mut World| on_black.lock().unwrap().call(world, ()));
+
+                    transition.stage = TransitionStage::Out;
+                    transition.timer = Timer::new(transition.duration, TimerMode::Once);
+                }
+                TransitionStage::Out => {
+                    let on_complete = transition.on_complete.0.clone();
+                    commands.queue(move |world: &mut World| {
+                        on_complete.lock().unwrap().call(world, ())
+                    });
+
+                    commands.entity(entity).despawn();
+                }
+            }
+        }
+    }
+}
+
 #[derive(Default, Component)]
 #[require(
     Collider::rectangle(24., 24.),
@@ -71,8 +193,11 @@ fn door(
     player: Single<(Entity, &mut Transform), With<Player>>,
     transforms: Query<&GlobalTransform>,
     mut writer: EventWriter<TextboxEvent>,
+
+    mut commands: Commands,
+    server: Res<AssetServer>,
 ) -> Result {
-    let (entity, mut transform) = player.into_inner();
+    let (entity, _) = player.into_inner();
 
     for (target, child_of) in doors
         .iter()
@@ -94,8 +219,25 @@ fn door(
         match target {
             Some(target) => {
                 let level_t = transforms.get(child_of.parent())?.translation();
-                transform.translation.x = target.x * 16. + level_t.x;
-                transform.translation.y = -target.y * 16. + level_t.y;
+
+                commands.entity(entity).remove::<Actions<PlayerContext>>();
+                commands.spawn(
+                    SamplePlayer::new(server.load("audio/sfx/door.wav"))
+                        .with_volume(Volume::Decibels(-12.0)),
+                );
+
+                commands.spawn(ScreenTransition::new(
+                    Duration::from_millis(250),
+                    move |mut player: Single<&mut Transform, With<Player>>| {
+                        player.translation.x = target.x * 16. + level_t.x;
+                        player.translation.y = -target.y * 16. + level_t.y;
+                    },
+                    |player: Single<Entity, With<Player>>, mut commands: Commands| {
+                        commands
+                            .entity(*player)
+                            .insert(Actions::<PlayerContext>::default());
+                    },
+                ));
             }
             None => {
                 writer.write(TextboxEvent::section(TextBlurb::narrator("Locked...")));
