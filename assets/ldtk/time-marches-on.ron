@@ -1,20 +1,16 @@
 (
     io: (
         scene_tiles: {
-            (0): "ldtk/0.tiles.ron",
-            (45): "ldtk/45.tiles.ron",
+            (51): "ldtk/51.tiles.ron",
         },
         scene_entities: {
-            (0): "ldtk/0.entities.ron",
-            (45): "ldtk/45.entities.ron",
+            (51): "ldtk/51.entities.ron",
         },
         composites: {
-            ((0), (2)): "ldtk/Level_0_BackgroundComposite_composite.png",
-            ((45), (2)): "ldtk/Level_1_BackgroundComposite_composite.png",
+            ((51), (2)): "ldtk/Level_0_BackgroundComposite_composite.png",
         },
     ),
     levels: [
-        (0),
-        (45),
+        (51),
     ],
 )

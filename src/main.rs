@@ -26,8 +26,8 @@ mod textbox;
 #[allow(unused)]
 mod world;
 
-pub const WIDTH: f32 = 320.;
-pub const HEIGHT: f32 = 180.;
+pub const WIDTH: f32 = 280.;
+pub const HEIGHT: f32 = 160.;
 pub const RESOLUTION_SCALE: f32 = 4.;
 
 pub const TILE_SIZE: f32 = 16.;
