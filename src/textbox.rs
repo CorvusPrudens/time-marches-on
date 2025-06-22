@@ -38,7 +38,7 @@ pub struct TextboxEvent(Vec<TextBlurb>);
 impl TextboxEvent {
     pub fn new(sections: impl IntoIterator<Item = TextBlurb>) -> Self {
         let sections = sections.into_iter().collect::<Vec<_>>();
-        debug_assert!(sections.len() > 0);
+        debug_assert!(!sections.is_empty());
 
         Self(sections)
     }
@@ -73,9 +73,9 @@ impl TextBlurb {
     pub fn main_character(text: impl Into<Cow<'static, str>>) -> Self {
         Self::new(text, "main.png", |commands, server| {
             commands.spawn((
-                PitchRange(0.9..1.1),
+                PitchRange::new(0.05),
                 SamplePlayer {
-                    sample: server.load(glyph_sample("main.wav")),
+                    sample: server.load(glyph_sample("medium.wav")),
                     volume: Volume::Linear(0.5),
                     ..Default::default()
                 },

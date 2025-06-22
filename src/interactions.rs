@@ -27,7 +27,12 @@ fn bind(
 
     actions
         .bind::<InteractAction>()
-        .to((KeyCode::KeyJ, KeyCode::Space, GamepadButton::South))
+        .to((
+            KeyCode::KeyJ,
+            KeyCode::KeyE,
+            KeyCode::Space,
+            GamepadButton::South,
+        ))
         .with_conditions(JustPress::default());
 
     Ok(())

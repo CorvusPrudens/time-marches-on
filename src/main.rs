@@ -6,6 +6,7 @@ use bevy::DefaultPlugins;
 use bevy::app::{App, FixedMainScheduleOrder};
 use bevy::asset::AssetMetaCheck;
 use bevy::ecs::schedule::ScheduleLabel;
+use bevy::log::{Level, LogPlugin};
 use bevy::prelude::*;
 use bevy::window::{PrimaryWindow, WindowResolution};
 use bevy::winit::WinitWindows;
@@ -15,6 +16,7 @@ use winit::window::Icon;
 
 mod fragments;
 mod interactions;
+mod inventory;
 mod loading;
 mod menu;
 mod player;
@@ -59,7 +61,11 @@ fn main() {
                 meta_check: AssetMetaCheck::Never,
                 ..default()
             })
-            .set(ImagePlugin::default_nearest()),
+            .set(ImagePlugin::default_nearest())
+            .set(LogPlugin {
+                level: Level::INFO,
+                ..Default::default()
+            }),
         bevy_tween::DefaultTweenPlugins,
         bevy_seedling::SeedlingPlugin::default(),
         bevy_enhanced_input::EnhancedInputPlugin,
@@ -82,12 +88,14 @@ fn main() {
         player::PlayerPlugin,
         textbox::TextboxPlugin,
         interactions::InteractionPlugin,
+        inventory::InventoryPlugin,
     ))
     .init_state::<GameState>()
+    .add_computed_state::<Paused>()
     .init_schedule(Avian)
     .insert_resource(Gravity(Vec2::ZERO))
     .add_systems(Startup, set_window_icon)
-    .add_systems(OnEnter(GameState::Playing), load_ldtk);
+    .add_systems(OnEnter(GameState::Playing { paused: false }), load_ldtk);
 
     app.world_mut()
         .resource_mut::<FixedMainScheduleOrder>()
@@ -101,7 +109,23 @@ enum GameState {
     #[default]
     Loading,
     Menu,
-    Playing,
+    Playing {
+        paused: bool,
+    },
+}
+
+#[derive(Default, Clone, Eq, PartialEq, Debug, Hash)]
+struct Paused;
+
+impl ComputedStates for Paused {
+    type SourceStates = Option<GameState>;
+
+    fn compute(sources: Self::SourceStates) -> Option<Self> {
+        match sources {
+            Some(GameState::Playing { paused }) if paused => Some(Self),
+            _ => None,
+        }
+    }
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash, ScheduleLabel)]

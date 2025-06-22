@@ -57,7 +57,7 @@ fn setup_menu(mut commands: Commands) {
                     },
                     BackgroundColor(button_colors.normal),
                     button_colors,
-                    ChangeState(GameState::Playing),
+                    ChangeState(GameState::Playing { paused: false }),
                 ))
                 .with_child((
                     Text::new("Play"),
