@@ -1,20 +1,11 @@
-use std::time::Duration;
-
 use bevy::{
     input_focus::{
         InputDispatchPlugin, InputFocus, InputFocusVisible,
-        directional_navigation::{
-            DirectionalNavigation, DirectionalNavigationMap, DirectionalNavigationPlugin,
-        },
+        directional_navigation::{DirectionalNavigationMap, DirectionalNavigationPlugin},
     },
-    math::{CompassOctant, FloatOrd},
-    picking::{
-        backend::HitData,
-        pointer::{Location, PointerId},
-    },
-    platform::collections::{HashMap, HashSet},
+    math::CompassOctant,
+    platform::collections::HashMap,
     prelude::*,
-    render::camera::NormalizedRenderTarget,
 };
 use bevy_enhanced_input::prelude::{Actions, InputContextAppExt};
 
@@ -35,23 +26,18 @@ impl Plugin for InventoryPlugin {
                 scroll::ScrollPlugin,
                 InputDispatchPlugin,
                 DirectionalNavigationPlugin,
+                item::ItemsPlugin,
             ))
             // This resource is canonically used to track whether or not to render a focus indicator
             // It starts as false, but we set it to true here as we would like to see the focus indicator
             .insert_resource(InputFocusVisible(true))
-            // We've made a simple resource to keep track of the actions that are currently being pressed for this example
-            .init_resource::<ActionState>()
-            // Input is generally handled during PreUpdate
             // We're turning inputs into actions first, then using those actions to determine navigation
-            .add_systems(PreUpdate, (process_inputs, navigate).chain())
             .add_systems(
                 Update,
                 (
                     invert_focused_text,
                     // We need to show which button is currently focused
                     highlight_focused_element,
-                    // Pressing the "Interact" button while we have a focused element should simulate a click
-                    interact_with_focused_button,
                     // We're doing a tiny animation when the button is interacted with,
                     // so we need a timer and a polling mechanism to reset it
                     reset_button_after_interaction,
@@ -67,7 +53,9 @@ impl Plugin for InventoryPlugin {
             .add_observer(pause::bind)
             .add_observer(pause::pause)
             .add_observer(input::bind)
-            .add_observer(input::unpause);
+            .add_observer(input::unpause)
+            .add_observer(input::navigate)
+            .add_observer(input::interact_with_focused_button);
     }
 }
 
@@ -105,7 +93,7 @@ fn reset_button_after_interaction(
     time: Res<Time>,
     mut query: Query<(&mut ResetTimer, &mut BackgroundColor)>,
 ) {
-    for (mut reset_timer, mut color) in query.iter_mut() {
+    for (mut reset_timer, mut _color) in query.iter_mut() {
         reset_timer.tick(time.delta());
         if reset_timer.just_finished() {
             // color.0 = NORMAL_BUTTON.into();
@@ -132,9 +120,14 @@ fn setup_ui(
     mut commands: Commands,
     mut directional_nav_map: ResMut<DirectionalNavigationMap>,
     mut input_focus: ResMut<InputFocus>,
+
+    // grab the items from the inventory
+    inventory: Single<Option<&Children>, With<item::Inventory>>,
+    items: Query<&item::InventoryItem>,
+
     server: Res<AssetServer>,
-) {
-    const N_ROWS: u16 = 3;
+) -> Result {
+    // const N_ROWS: u16 = 3;
     const N_COLS: u16 = 3;
 
     // Create a full-screen background node
@@ -189,9 +182,12 @@ fn setup_ui(
         ))
         .id();
 
+    let num_items = inventory.map(|c| c.len()).unwrap_or_default() as u16;
+    let n_rows = num_items.div_ceil(N_COLS);
+
     let content_node = commands
         .spawn((
-            scroll::VerticalScroll::new(2, 200.0),
+            scroll::VerticalScroll::new(n_rows as usize, 200.0),
             BackgroundColor(Color::BLACK),
             BorderColor(Color::WHITE),
             Node {
@@ -207,12 +203,10 @@ fn setup_ui(
     let grid_root_entity = commands
         .spawn((Node {
             display: Display::Grid,
-            // width: Val::Percent(100.),
-            // height: Val::Percent(100.),
-            // Set the number of rows and columns in the grid
-            // allowing the grid to automatically size the cells
             grid_template_columns: RepeatedGridTrack::auto(N_COLS),
-            grid_template_rows: RepeatedGridTrack::auto(N_ROWS),
+            grid_template_rows: RepeatedGridTrack::auto(n_rows),
+            justify_self: JustifySelf::Start,
+            align_self: AlignSelf::Start,
             row_gap: Val::ZERO,
             column_gap: Val::ZERO,
             ..default()
@@ -232,12 +226,19 @@ fn setup_ui(
 
     commands.entity(content_node).add_child(grid_root_entity);
 
-    let mut button_entities: HashMap<(u16, u16), Entity> = HashMap::default();
-    for row in 0..N_ROWS {
-        for col in 0..N_COLS {
-            let button_name = format!("Button {}-{}", row, col);
+    let mut item_iter = inventory.iter().flat_map(|i| i.iter());
 
-            let button_entity = commands.spawn(inventory_slot(button_name, &server)).id();
+    let mut button_entities: HashMap<(u16, u16), Entity> = HashMap::default();
+    for row in 0..n_rows {
+        for col in 0..N_COLS {
+            let Some(item) = item_iter.next() else {
+                break;
+            };
+            let item = items.get(item)?;
+
+            let button_entity = commands
+                .spawn(inventory_slot(item.name.clone(), &server))
+                .id();
 
             // Add the button to the grid
             commands.entity(grid_root_entity).add_child(button_entity);
@@ -249,9 +250,9 @@ fn setup_ui(
 
     // Connect all of the buttons in the same row to each other,
     // looping around when the edge is reached.
-    for row in 0..N_ROWS {
+    for row in 0..n_rows {
         let entities_in_row: Vec<Entity> = (0..N_COLS)
-            .map(|col| button_entities.get(&(row, col)).unwrap())
+            .filter_map(|col| button_entities.get(&(row, col)))
             .copied()
             .collect();
         directional_nav_map.add_looping_edges(&entities_in_row, CompassOctant::East);
@@ -261,8 +262,8 @@ fn setup_ui(
     // but don't loop around when the edge is reached.
     // While looping is a very reasonable choice, we're not doing it here to demonstrate the different options.
     for col in 0..N_COLS {
-        let entities_in_column: Vec<Entity> = (0..N_ROWS)
-            .map(|row| button_entities.get(&(row, col)).unwrap())
+        let entities_in_column: Vec<Entity> = (0..n_rows)
+            .filter_map(|row| button_entities.get(&(row, col)))
             .copied()
             .collect();
 
@@ -270,8 +271,11 @@ fn setup_ui(
     }
 
     // When changing scenes, remember to set an initial focus!
-    let top_left_entity = *button_entities.get(&(0, 0)).unwrap();
-    input_focus.set(top_left_entity);
+    if let Some(top_left_entity) = button_entities.get(&(0, 0)) {
+        input_focus.set(*top_left_entity);
+    }
+
+    Ok(())
 }
 
 fn inventory_slot(name: impl Into<String>, server: &AssetServer) -> impl Bundle {
@@ -308,129 +312,6 @@ fn inventory_slot(name: impl Into<String>, server: &AssetServer) -> impl Bundle 
             InvertOnFocus,
         )],
     )
-}
-
-// The indirection between inputs and actions allows us to easily remap inputs
-// and handle multiple input sources (keyboard, gamepad, etc.) in our game
-#[derive(Debug, PartialEq, Eq, Hash)]
-enum DirectionalNavigationAction {
-    Up,
-    Down,
-    Left,
-    Right,
-    Select,
-}
-
-impl DirectionalNavigationAction {
-    fn variants() -> Vec<Self> {
-        vec![
-            DirectionalNavigationAction::Up,
-            DirectionalNavigationAction::Down,
-            DirectionalNavigationAction::Left,
-            DirectionalNavigationAction::Right,
-            DirectionalNavigationAction::Select,
-        ]
-    }
-
-    fn keycode(&self) -> KeyCode {
-        match self {
-            DirectionalNavigationAction::Up => KeyCode::ArrowUp,
-            DirectionalNavigationAction::Down => KeyCode::ArrowDown,
-            DirectionalNavigationAction::Left => KeyCode::ArrowLeft,
-            DirectionalNavigationAction::Right => KeyCode::ArrowRight,
-            DirectionalNavigationAction::Select => KeyCode::Enter,
-        }
-    }
-
-    fn gamepad_button(&self) -> GamepadButton {
-        match self {
-            DirectionalNavigationAction::Up => GamepadButton::DPadUp,
-            DirectionalNavigationAction::Down => GamepadButton::DPadDown,
-            DirectionalNavigationAction::Left => GamepadButton::DPadLeft,
-            DirectionalNavigationAction::Right => GamepadButton::DPadRight,
-            // This is the "A" button on an Xbox controller,
-            // and is conventionally used as the "Select" / "Interact" button in many games
-            DirectionalNavigationAction::Select => GamepadButton::South,
-        }
-    }
-}
-
-// This keeps track of the inputs that are currently being pressed
-#[derive(Default, Resource)]
-struct ActionState {
-    pressed_actions: HashSet<DirectionalNavigationAction>,
-}
-
-fn process_inputs(
-    mut action_state: ResMut<ActionState>,
-    keyboard_input: Res<ButtonInput<KeyCode>>,
-    gamepad_input: Query<&Gamepad>,
-) {
-    // Reset the set of pressed actions each frame
-    // to ensure that we only process each action once
-    action_state.pressed_actions.clear();
-
-    for action in DirectionalNavigationAction::variants() {
-        // Use just_pressed to ensure that we only process each action once
-        // for each time it is pressed
-        if keyboard_input.just_pressed(action.keycode()) {
-            action_state.pressed_actions.insert(action);
-        }
-    }
-
-    // We're treating this like a single-player game:
-    // if multiple gamepads are connected, we don't care which one is being used
-    for gamepad in gamepad_input.iter() {
-        for action in DirectionalNavigationAction::variants() {
-            // Unlike keyboard input, gamepads are bound to a specific controller
-            if gamepad.just_pressed(action.gamepad_button()) {
-                action_state.pressed_actions.insert(action);
-            }
-        }
-    }
-}
-
-fn navigate(action_state: Res<ActionState>, mut directional_navigation: DirectionalNavigation) {
-    // If the user is pressing both left and right, or up and down,
-    // we should not move in either direction.
-    let net_east_west = action_state
-        .pressed_actions
-        .contains(&DirectionalNavigationAction::Right) as i8
-        - action_state
-            .pressed_actions
-            .contains(&DirectionalNavigationAction::Left) as i8;
-
-    let net_north_south = action_state
-        .pressed_actions
-        .contains(&DirectionalNavigationAction::Up) as i8
-        - action_state
-            .pressed_actions
-            .contains(&DirectionalNavigationAction::Down) as i8;
-
-    // Compute the direction that the user is trying to navigate in
-    let maybe_direction = match (net_east_west, net_north_south) {
-        (0, 0) => None,
-        (0, 1) => Some(CompassOctant::North),
-        (1, 1) => Some(CompassOctant::NorthEast),
-        (1, 0) => Some(CompassOctant::East),
-        (1, -1) => Some(CompassOctant::SouthEast),
-        (0, -1) => Some(CompassOctant::South),
-        (-1, -1) => Some(CompassOctant::SouthWest),
-        (-1, 0) => Some(CompassOctant::West),
-        (-1, 1) => Some(CompassOctant::NorthWest),
-        _ => None,
-    };
-
-    if let Some(direction) = maybe_direction {
-        match directional_navigation.navigate(direction) {
-            // In a real game, you would likely want to play a sound or show a visual effect
-            // on both successful and unsuccessful navigation attempts
-            Ok(entity) => {
-                println!("Navigated {direction:?} successfully. {entity} is now focused.");
-            }
-            Err(e) => println!("Navigation failed: {e}"),
-        }
-    }
 }
 
 /// A marker indicating that this UI element should invert its
@@ -477,7 +358,7 @@ fn highlight_focused_element(
 
 fn focus_on_hover(
     trigger: Trigger<Pointer<Over>>,
-    focus_targets: Query<(), (With<InventorySlot>)>,
+    focus_targets: Query<(), With<InventorySlot>>,
     mut input_focus: ResMut<InputFocus>,
 ) {
     if focus_targets.get(trigger.target()).is_err() {
@@ -485,49 +366,4 @@ fn focus_on_hover(
     }
 
     input_focus.set(trigger.target());
-}
-
-// By sending a Pointer<Click> trigger rather than directly handling button-like interactions,
-// we can unify our handling of pointer and keyboard/gamepad interactions
-fn interact_with_focused_button(
-    action_state: Res<ActionState>,
-    input_focus: Res<InputFocus>,
-    mut commands: Commands,
-) {
-    if action_state
-        .pressed_actions
-        .contains(&DirectionalNavigationAction::Select)
-    {
-        if let Some(focused_entity) = input_focus.0 {
-            commands.trigger_targets(
-                Pointer::<Click> {
-                    target: focused_entity,
-                    // We're pretending that we're a mouse
-                    pointer_id: PointerId::Mouse,
-                    // This field isn't used, so we're just setting it to a placeholder value
-                    pointer_location: Location {
-                        target: NormalizedRenderTarget::Image(
-                            bevy::render::camera::ImageRenderTarget {
-                                handle: Handle::default(),
-                                scale_factor: FloatOrd(1.0),
-                            },
-                        ),
-                        position: Vec2::ZERO,
-                    },
-                    event: Click {
-                        button: PointerButton::Primary,
-                        // This field isn't used, so we're just setting it to a placeholder value
-                        hit: HitData {
-                            camera: Entity::PLACEHOLDER,
-                            depth: 0.0,
-                            position: None,
-                            normal: None,
-                        },
-                        duration: Duration::from_secs_f32(0.1),
-                    },
-                },
-                focused_entity,
-            );
-        }
-    }
 }

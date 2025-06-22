@@ -1,7 +1,7 @@
 use bevy::prelude::*;
 use bevy_enhanced_input::prelude::*;
 
-use crate::{GameState, PlayingState, player::PlayerContext};
+use crate::{PlayingState, player::PlayerContext};
 
 #[derive(Debug, InputAction)]
 #[input_action(output = bool, require_reset = true)]
