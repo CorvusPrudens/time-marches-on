@@ -3,6 +3,7 @@ use bevy::prelude::*;
 use bevy_enhanced_input::prelude::*;
 
 use crate::player::PlayerContext;
+use crate::textbox::{TextSection, TextboxEvent};
 
 pub struct InteractionPlugin;
 
@@ -49,6 +50,7 @@ fn interact(
     interactor: Query<&GlobalTransform>,
     interactions: Query<(&crate::world::Interaction, &GlobalTransform)>,
     collisions: Collisions,
+    mut writer: EventWriter<TextboxEvent>,
 ) -> Result {
     let target = trigger.target();
     let interactor = interactor.get(target)?;
@@ -81,7 +83,9 @@ fn interact(
         return Ok(());
     };
 
-    info!("interactor: {interactor:?}");
+    writer.write(TextboxEvent::section(TextSection::new(
+        interactor.flavor.clone(),
+    )));
 
     Ok(())
 }
