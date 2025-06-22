@@ -17,7 +17,7 @@ impl Plugin for InteractionPlugin {
 
 #[derive(Debug, InputAction)]
 #[input_action(output = bool, require_reset = true)]
-struct InteractAction;
+pub struct InteractAction;
 
 fn bind(
     trigger: Trigger<Binding<PlayerContext>>,

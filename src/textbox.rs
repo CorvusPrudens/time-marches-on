@@ -70,6 +70,20 @@ impl TextBlurb {
         }
     }
 
+    pub fn narrator(text: impl Into<Cow<'static, str>>) -> Self {
+        // lol
+        Self::new(text, "", |commands, server| {
+            commands.spawn((
+                PitchRange::new(0.02),
+                SamplePlayer {
+                    sample: server.load(glyph_sample("low.wav")),
+                    //volume: Volume::Linear(1.),
+                    ..Default::default()
+                },
+            ));
+        })
+    }
+
     pub fn main_character(text: impl Into<Cow<'static, str>>) -> Self {
         Self::new(text, "main.png", |commands, server| {
             commands.spawn((

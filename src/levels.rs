@@ -1,9 +1,12 @@
 use avian2d::prelude::*;
 use bevy::platform::collections::HashMap;
 use bevy::prelude::*;
+use bevy_enhanced_input::events::Fired;
 use bevy_optix::camera::MainCamera;
 
+use crate::interactions::InteractAction;
 use crate::player::Player;
+use crate::textbox::{TextBlurb, TextboxEvent};
 use crate::{GameState, HexColor, Layer, TILE_SIZE, world};
 
 pub struct LevelPlugin;
@@ -11,9 +14,13 @@ pub struct LevelPlugin;
 impl Plugin for LevelPlugin {
     fn build(&self, app: &mut App) {
         app.register_required_components::<world::Teleport, Teleporter>()
+            .register_required_components::<world::Door, Door>()
+            .register_required_components::<world::SideDoor1, Door>()
+            .register_required_components::<world::SideDoor2, Door>()
             .add_systems(Update, add_tile_collision)
             .add_systems(OnEnter(GameState::Playing), load_ldtk)
-            .add_observer(teleport);
+            .add_observer(teleport)
+            .add_observer(door);
     }
 }
 
@@ -43,6 +50,60 @@ fn teleport(
     };
 
     transform.translation.x += diff;
+}
+
+#[derive(Default, Component)]
+#[require(
+    Collider::rectangle(24., 24.),
+    Sensor,
+    CollidingEntities,
+    CollisionLayers::new(Layer::Default, Layer::Player)
+)]
+struct Door;
+
+fn door(
+    _: Trigger<Fired<InteractAction>>,
+
+    doors: Query<(&world::Door, &CollidingEntities, &ChildOf)>,
+    side_doors1: Query<(&world::SideDoor1, &CollidingEntities, &ChildOf)>,
+    side_doors2: Query<(&world::SideDoor2, &CollidingEntities, &ChildOf)>,
+
+    player: Single<(Entity, &mut Transform), With<Player>>,
+    transforms: Query<&GlobalTransform>,
+    mut writer: EventWriter<TextboxEvent>,
+) -> Result {
+    let (entity, mut transform) = player.into_inner();
+
+    for (target, child_of) in doors
+        .iter()
+        .map(|(door, colliding, child_of)| (door.target, colliding, child_of))
+        .chain(
+            side_doors1
+                .iter()
+                .map(|(door, colliding, child_of)| (door.target, colliding, child_of)),
+        )
+        .chain(
+            side_doors2
+                .iter()
+                .map(|(door, colliding, child_of)| (door.target, colliding, child_of)),
+        )
+        .filter_map(|(target, colliding, child_of)| {
+            colliding.contains(&entity).then_some((target, child_of))
+        })
+    {
+        match target {
+            Some(target) => {
+                let level_t = transforms.get(child_of.parent())?.translation();
+                transform.translation.x = target.x * 16. + level_t.x;
+                transform.translation.y = -target.y * 16. + level_t.y;
+            }
+            None => {
+                writer.write(TextboxEvent::section(TextBlurb::narrator("Locked...")));
+            }
+        }
+    }
+
+    Ok(())
 }
 
 fn load_ldtk(
