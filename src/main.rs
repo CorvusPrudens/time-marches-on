@@ -14,6 +14,7 @@ use bevy_optix::pixel_perfect::CanvasDimensions;
 use std::io::Cursor;
 use winit::window::Icon;
 
+mod animation;
 mod entities;
 mod fragments;
 mod interactions;
@@ -90,6 +91,7 @@ fn main() {
         inventory::InventoryPlugin,
         levels::LevelPlugin,
         entities::EntityPlugin,
+        animation::AnimationPlugin,
     ))
     .init_state::<GameState>()
     .add_sub_state::<PlayingState>()

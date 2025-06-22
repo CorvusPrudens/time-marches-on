@@ -6,19 +6,26 @@ use bevy_enhanced_input::prelude::*;
 use bevy_optix::camera::PixelSnap;
 use bevy_optix::zorder::YOrigin;
 
+use crate::animation::{AnimationAppExt, AnimationController, AnimationSprite};
 use crate::{Layer, world};
 
-const PLAYER_SPEED: f32 = 100.;
+const PLAYER_SPEED: f32 = 70.;
 
 pub struct PlayerPlugin;
 
 impl Plugin for PlayerPlugin {
     fn build(&self, app: &mut App) {
         app.add_input_context::<PlayerContext>()
+            .register_layout(
+                "textures/main-character.png",
+                TextureAtlasLayout::from_grid(UVec2::splat(32), 12, 1, None, None),
+            )
             .register_required_components::<world::PlayerVessel, Player>()
             .add_observer(bind)
             .add_observer(apply_movement)
-            .add_observer(stop_movement);
+            .add_observer(stop_movement)
+            .add_observer(move_sprite)
+            .add_observer(stop_sprite);
     }
 }
 
@@ -36,10 +43,18 @@ impl Plugin for PlayerPlugin {
 pub struct Player;
 
 impl Player {
-    fn bind_camera(mut world: DeferredWorld, _: HookContext) {
+    fn bind_camera(mut world: DeferredWorld, ctx: HookContext) {
         world
             .commands()
             .run_system_cached(bevy_optix::camera::bind_camera::<Player>);
+        world
+            .commands()
+            .entity(ctx.entity)
+            .insert(AnimationSprite::repeating(
+                "textures/main-character.png",
+                0.5,
+                0..1,
+            ));
     }
 }
 
@@ -75,9 +90,45 @@ fn apply_movement(
     mut velocity: Single<&mut LinearVelocity, (With<Player>, Without<BlockControls>)>,
 ) {
     velocity.0 = trigger.value.clamp_length(0., 1.) * PLAYER_SPEED;
-    if velocity.0.x != 0.0 && velocity.0.x.abs() < f32::EPSILON {
-        velocity.0.x = 0.;
+}
+
+fn move_sprite(
+    trigger: Trigger<Fired<MoveAction>>,
+    mut commands: Commands,
+    mut last: Local<Vec2>,
+    player: Single<Option<&AnimationController>, With<Player>>,
+) {
+    let v = trigger.value;
+    if *last == v && player.is_some() {
+        return;
     }
+    *last = v;
+
+    let dir = if v.x.abs() < v.y.abs() {
+        Vec2::new(0.0, if v.y.is_sign_positive() { 1. } else { -1. })
+    } else {
+        Vec2::new(if v.x.is_sign_positive() { 1. } else { -1. }, 0.0)
+    };
+
+    let range = match dir.to_array() {
+        [0.0, -1.0] => 1..3,
+        [0.0, 1.0] => 4..6,
+        [1.0, 0.0] => 7..9,
+        [-1.0, 0.0] => 10..12,
+        _ => unreachable!(),
+    };
+
+    if player.is_some_and(|player| player.indices.seq[0] == range.start) {
+        return;
+    }
+
+    commands
+        .entity(trigger.target())
+        .insert(AnimationSprite::repeating(
+            "textures/main-character.png",
+            0.2,
+            range,
+        ));
 }
 
 fn stop_movement(
@@ -91,4 +142,16 @@ fn stop_movement(
         .xy()
         .round()
         .extend(transform.translation.z)
+}
+
+fn stop_sprite(
+    _: Trigger<Completed<MoveAction>>,
+    mut commands: Commands,
+    player: Single<(Entity, &mut Sprite, &AnimationController), With<Player>>,
+) {
+    let (entity, mut sprite, animation) = player.into_inner();
+    commands.entity(entity).remove::<AnimationController>();
+    if let Some(atlas) = &mut sprite.texture_atlas {
+        atlas.index = animation.indices.seq[0] - 1;
+    }
 }
