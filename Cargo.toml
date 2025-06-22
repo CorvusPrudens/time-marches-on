@@ -39,14 +39,17 @@ dev = ["bevy/dynamic_linking"]
 [dependencies]
 bevy = { version = "0.16", default-features = false, features = [
   "animation",
+  "async_executor",
   "bevy_asset",
   "bevy_color",
   "bevy_core_pipeline",
   "bevy_gilrs",
   "bevy_gizmos",
   "bevy_gltf",
+  "bevy_input_focus",
   "bevy_log",
   "bevy_mesh_picking_backend",
+  "bevy_pbr",
   "bevy_picking",
   "bevy_render",
   "bevy_scene",
@@ -65,6 +68,7 @@ bevy = { version = "0.16", default-features = false, features = [
   "multi_threaded",
   "png",
   "smaa_luts",
+  "std",
   "sysinfo_plugin",
   "tonemapping_luts",
   "webgl2",
@@ -92,6 +96,8 @@ bevy_asset_loader = { version = "0.23.0" }
 bevy_tween = "0.8.0"
 bevy_enhanced_input = "0.11"
 serde = "1.0.219"
+# bevy_egui = "0.34.1"
+# bevy-inspector-egui = "0.31.0"
 
 [build-dependencies]
 embed-resource = "1"

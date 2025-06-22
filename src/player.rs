@@ -4,8 +4,9 @@ use bevy::ecs::world::DeferredWorld;
 use bevy::prelude::*;
 use bevy_enhanced_input::prelude::*;
 use bevy_optix::camera::PixelSnap;
+use bevy_optix::zorder::YOrigin;
 
-use crate::world;
+use crate::{Layer, world};
 
 const PLAYER_SPEED: f32 = 100.;
 
@@ -22,7 +23,15 @@ impl Plugin for PlayerPlugin {
 }
 
 #[derive(Default, Component)]
-#[require(RigidBody::Kinematic, Actions<PlayerContext>, PixelSnap, Collider::rectangle(8.0, 16.0))]
+#[require(
+    RigidBody::Dynamic,
+    LockedAxes::ROTATION_LOCKED,
+    Actions<PlayerContext>,
+    PixelSnap,
+    Collider::rectangle(8.0, 16.0),
+    CollisionLayers::new(Layer::Player, Layer::Default),
+    YOrigin(-0.),
+)]
 #[component(on_insert = Self::bind_camera)]
 pub struct Player;
 

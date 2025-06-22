@@ -1,7 +1,7 @@
 use bevy::prelude::*;
 use bevy_enhanced_input::prelude::*;
 
-use crate::GameState;
+use crate::{GameState, PlayingState};
 
 #[derive(InputContext)]
 pub struct InventoryContext;
@@ -33,13 +33,13 @@ pub fn bind(
 pub fn unpause(
     trigger: Trigger<Fired<UnpauseAction>>,
     mut commands: Commands,
-    mut next_state: ResMut<NextState<GameState>>,
+    mut next_state: ResMut<NextState<PlayingState>>,
 ) -> Result {
     // remove player context, enter paused state
     commands
         .entity(trigger.target())
         .remove::<Actions<InventoryContext>>();
-    next_state.set(GameState::Playing { paused: false });
+    next_state.set(PlayingState::Playing);
 
     Ok(())
 }
