@@ -19,6 +19,7 @@ mod loading;
 mod menu;
 mod player;
 mod textbox;
+#[allow(unused)]
 mod world;
 
 pub const WIDTH: f32 = 320.;
@@ -57,7 +58,8 @@ fn main() {
             .set(AssetPlugin {
                 meta_check: AssetMetaCheck::Never,
                 ..default()
-            }),
+            })
+            .set(ImagePlugin::default_nearest()),
         bevy_tween::DefaultTweenPlugins,
         bevy_seedling::SeedlingPlugin::default(),
         bevy_enhanced_input::EnhancedInputPlugin,

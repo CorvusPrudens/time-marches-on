@@ -3,7 +3,7 @@ use bevy::prelude::*;
 use bevy_enhanced_input::prelude::*;
 
 use crate::player::PlayerContext;
-use crate::textbox::{TextSection, TextboxEvent};
+use crate::textbox::{TextBlurb, TextboxEvent};
 
 pub struct InteractionPlugin;
 
@@ -16,7 +16,7 @@ impl Plugin for InteractionPlugin {
 }
 
 #[derive(Debug, InputAction)]
-#[input_action(output = bool)]
+#[input_action(output = bool, require_reset = true)]
 struct InteractAction;
 
 fn bind(
@@ -83,7 +83,7 @@ fn interact(
         return Ok(());
     };
 
-    writer.write(TextboxEvent::section(TextSection::new(
+    writer.write(TextboxEvent::section(TextBlurb::main_character(
         interactor.flavor.clone(),
     )));
 

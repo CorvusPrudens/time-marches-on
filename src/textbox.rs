@@ -1,4 +1,5 @@
 use std::borrow::Cow;
+use std::sync::Arc;
 
 use bevy::prelude::*;
 use bevy::sprite::Anchor;
@@ -9,7 +10,6 @@ use bevy_pretty_text::prelude::{GlyphRevealed, Reveal, TypeWriter, TypeWriterFin
 use bevy_seedling::prelude::Volume;
 use bevy_seedling::sample::{PitchRange, SamplePlayer};
 
-use crate::GameState;
 use crate::player::{Player, PlayerContext};
 
 pub struct TextboxPlugin;
@@ -18,42 +18,85 @@ impl Plugin for TextboxPlugin {
     fn build(&self, app: &mut App) {
         app.add_input_context::<TextboxContext>()
             .add_event::<TextboxEvent>()
-            .add_systems(OnEnter(GameState::Playing), spawn_textbox)
+            .init_resource::<GlyphReveal>()
             .add_systems(Update, textbox_event)
             .add_observer(bind)
             .add_observer(close_textbox)
-            .add_observer(reveal_textbox)
-            .add_observer(reveal_debounce);
-        //.add_systems(Update, bounds_gizmo);
+            .add_observer(reveal_textbox);
     }
 }
 
-#[derive(Event)]
-pub struct TextboxEvent(Vec<TextSection>);
+pub fn glyph_sample(glyph: &'static str) -> String {
+    format!("audio/sfx/glyph/{}", glyph)
+}
 
+/// Spawn a textbox and present each `TextBlurb` in sequence with breaks.
+#[derive(Event)]
+pub struct TextboxEvent(Vec<TextBlurb>);
+
+#[allow(unused)]
 impl TextboxEvent {
-    pub fn new(sections: impl IntoIterator<Item = TextSection>) -> Self {
+    pub fn new(sections: impl IntoIterator<Item = TextBlurb>) -> Self {
         let sections = sections.into_iter().collect::<Vec<_>>();
         debug_assert!(sections.len() > 0);
 
         Self(sections)
     }
 
-    pub fn section(section: TextSection) -> Self {
+    pub fn section(section: TextBlurb) -> Self {
         Self::new([section])
     }
 }
 
 #[derive(Clone)]
-pub struct TextSection {
-    pub text: Cow<'static, str>,
+pub struct TextBlurb {
+    text: Cow<'static, str>,
+    character: CharacterSprite,
+    glyph: Arc<dyn Fn(&mut Commands, &AssetServer) + Send + Sync>,
 }
 
-impl TextSection {
-    pub fn new(text: impl Into<Cow<'static, str>>) -> Self {
-        Self { text: text.into() }
+impl TextBlurb {
+    /// New text blurb with relative asset path:
+    ///   - character: `textures/characters/`
+    pub fn new(
+        text: impl Into<Cow<'static, str>>,
+        character: impl AsRef<str>,
+        glyph: impl Fn(&mut Commands, &AssetServer) + Send + Sync + 'static,
+    ) -> Self {
+        Self {
+            text: text.into(),
+            character: CharacterSprite::new(character.as_ref()),
+            glyph: Arc::new(glyph),
+        }
+    }
+
+    pub fn main_character(text: impl Into<Cow<'static, str>>) -> Self {
+        Self::new(text, "main.png", |commands, server| {
+            commands.spawn((
+                PitchRange(0.9..1.1),
+                SamplePlayer {
+                    sample: server.load(glyph_sample("main.wav")),
+                    volume: Volume::Linear(0.5),
+                    ..Default::default()
+                },
+            ));
+        })
     }
 }
+
+#[derive(Clone)]
+pub struct CharacterSprite(String);
+
+impl CharacterSprite {
+    /// New character sprite with relative asset path:
+    ///   - character: `textures/characters/`
+    pub fn new(character: impl AsRef<str>) -> Self {
+        Self(format!("textures/characters/{}", character.as_ref()))
+    }
+}
+
+#[derive(Component)]
+pub struct CharacterSpriteEntity;
 
 fn textbox_event(
     mut commands: Commands,
@@ -67,21 +110,22 @@ fn textbox_event(
 
     for event in reader.read() {
         commands.spawn(TextboxSections(event.0.iter().cloned().rev().collect()));
-        commands.run_system_cached(spawn_textbox);
         commands.entity(*player).remove::<Actions<PlayerContext>>();
+        commands.run_system_cached(spawn_textbox);
+        commands.run_system_cached(pop_next_section);
     }
 
     Ok(())
 }
 
 #[derive(Component)]
-struct TextboxSections(Vec<TextSection>);
+struct TextboxSections(Vec<TextBlurb>);
 
 #[derive(InputContext)]
 pub struct TextboxContext;
 
 #[derive(Debug, InputAction)]
-#[input_action(output = bool)]
+#[input_action(output = bool, require_reset = true)]
 struct Interact;
 
 fn bind(
@@ -102,24 +146,16 @@ struct AwaitInput;
 fn close_textbox(
     _: Trigger<Fired<Interact>>,
     mut commands: Commands,
-    textbox: Single<Entity, (With<AwaitInput>, Without<RevealDeBounce>)>,
-    text: Single<(Entity, &mut Text2d), With<TextboxText>>,
-    sections: Single<(Entity, &mut TextboxSections)>,
+    textbox: Single<Entity, With<AwaitInput>>,
+    sections: Single<(Entity, &TextboxSections)>,
     player: Single<Entity, With<Player>>,
 ) {
-    let (entity, mut sections) = sections.into_inner();
-
-    match sections.0.pop() {
-        Some(section) => {
-            let (entity, mut text) = text.into_inner();
-
-            text.0.clear();
-            text.0.extend(section.text.chars());
-
-            commands.entity(*textbox).remove::<AwaitInput>();
-            commands.entity(entity).insert(TypeWriter::cps(30.));
+    let (entity, sections) = sections.into_inner();
+    match sections.0.is_empty() {
+        false => {
+            commands.run_system_cached(pop_next_section);
         }
-        None => {
+        true => {
             commands.entity(*textbox).despawn();
             commands.entity(entity).despawn();
             commands
@@ -131,23 +167,11 @@ fn close_textbox(
 
 fn reveal_textbox(
     _: Trigger<Fired<Interact>>,
-    mut commands: Commands,
     mut text: Single<&mut Reveal, (With<TypeWriter>, With<TextboxText>)>,
-    textbox: Single<Entity, (With<Textbox>, Without<RevealDeBounce>, Without<AwaitInput>)>,
 ) {
+    // don't insert `AwaitInput` so that `close_textbox` does not also run,
+    // wait for `TypeWriterFinished` to fire!
     text.all();
-    commands.entity(*textbox).insert(RevealDeBounce);
-}
-
-#[derive(Component)]
-struct RevealDeBounce;
-
-fn reveal_debounce(
-    _: Trigger<Completed<Interact>>,
-    mut commands: Commands,
-    textbox: Single<Entity, With<RevealDeBounce>>,
-) {
-    commands.entity(*textbox).remove::<RevealDeBounce>();
 }
 
 #[derive(Component)]
@@ -157,11 +181,7 @@ struct Textbox;
 #[derive(Component)]
 struct TextboxText;
 
-fn spawn_textbox(
-    mut commands: Commands,
-    server: Res<AssetServer>,
-    mut sections: Single<&mut TextboxSections>,
-) {
+fn spawn_textbox(mut commands: Commands, server: Res<AssetServer>) {
     let bounds = Vec2::new(
         crate::WIDTH * crate::RESOLUTION_SCALE - 80.,
         crate::HEIGHT * crate::RESOLUTION_SCALE / 3.,
@@ -173,19 +193,19 @@ fn spawn_textbox(
             Textbox,
             Transform::from_xyz(0., 0., 500.),
             children![(
-                Sprite::from_image(server.load("textures/textbox.png"),),
-                Transform::from_xyz(0., 0., -1.).with_scale(Vec3::splat(crate::RESOLUTION_SCALE)),
+                Sprite::from_image(server.load("textures/textbox.png")),
+                Transform::from_xyz(0., 0., -2.).with_scale(Vec3::splat(crate::RESOLUTION_SCALE)),
                 HIGH_RES_LAYER,
             )],
         ))
+        .observe(await_input_visual)
+        .observe(remove_await_input_visual)
         .id();
 
-    let section = sections.0.pop().unwrap();
     let text = commands
         .spawn((
             TextboxText,
-            TypeWriter::cps(30.),
-            Text2d::new(section.text),
+            Text2d::default(),
             TextFont {
                 font: server.load("fonts/raster-forge.ttf"),
                 font_size: 32.,
@@ -203,15 +223,73 @@ fn spawn_textbox(
     commands.entity(textbox).add_child(text);
 }
 
-fn glyph_reveal(_: Trigger<GlyphRevealed>, mut commands: Commands, server: Res<AssetServer>) {
-    commands.spawn((
-        PitchRange(0.9..1.1),
-        SamplePlayer {
-            sample: server.load("audio/sfx/glyph.wav"),
-            volume: Volume::Linear(0.5),
-            ..Default::default()
-        },
+fn pop_next_section(
+    mut commands: Commands,
+    server: Res<AssetServer>,
+    mut sections: Single<&mut TextboxSections>,
+    mut reveal: ResMut<GlyphReveal>,
+    text: Single<(Entity, &mut Text2d), With<TextboxText>>,
+    textbox: Single<Entity, With<Textbox>>,
+    old_character: Option<Single<Entity, With<CharacterSpriteEntity>>>,
+) {
+    let section = sections.0.pop().unwrap();
+    reveal.0 = Some(section.glyph.clone());
+
+    if let Some(old_character) = old_character {
+        commands.entity(*old_character).despawn();
+    }
+
+    let (text_entity, mut text) = text.into_inner();
+    text.0.clear();
+    text.0.extend(section.text.chars());
+    commands.entity(text_entity).insert(TypeWriter::cps(30.));
+
+    commands
+        .entity(*textbox)
+        .remove::<AwaitInput>()
+        .with_child((
+            CharacterSpriteEntity,
+            Sprite::from_image(server.load(&section.character.0)),
+            Transform::from_xyz(0., 0., -3.).with_scale(Vec3::splat(crate::RESOLUTION_SCALE)),
+            HIGH_RES_LAYER,
+        ));
+}
+
+#[derive(Component)]
+struct AwaitinputVisual;
+
+fn await_input_visual(
+    trigger: Trigger<OnAdd, AwaitInput>,
+    mut commands: Commands,
+    server: Res<AssetServer>,
+) {
+    commands.entity(trigger.target()).with_child((
+        Sprite::from_image(server.load("textures/textbox_await.png")),
+        Transform::from_xyz(0., 0., -1.).with_scale(Vec3::splat(crate::RESOLUTION_SCALE)),
+        HIGH_RES_LAYER,
     ));
+}
+
+fn remove_await_input_visual(
+    _: Trigger<OnRemove, AwaitInput>,
+    mut commands: Commands,
+    visual: Single<Entity, With<AwaitinputVisual>>,
+) {
+    commands.entity(*visual).despawn();
+}
+
+#[derive(Default, Resource)]
+struct GlyphReveal(Option<Arc<dyn Fn(&mut Commands, &AssetServer) + Send + Sync>>);
+
+fn glyph_reveal(
+    _: Trigger<GlyphRevealed>,
+    mut commands: Commands,
+    server: Res<AssetServer>,
+    reveal: Res<GlyphReveal>,
+) {
+    if let Some(reveal) = &reveal.0 {
+        reveal(&mut commands, &server);
+    }
 }
 
 fn finish(
@@ -221,28 +299,3 @@ fn finish(
 ) {
     commands.entity(*textbox).insert(AwaitInput);
 }
-
-//fn bounds_gizmo(
-//    bounds: Query<(&GlobalTransform, &TextBounds, &Anchor, &TextLayoutInfo)>,
-//    mut gizmos: Gizmos,
-//) {
-//    for (gt, bounds, anchor, layout) in bounds.iter() {
-//        if let Some(bounds) = bounds.width.and_then(|width| {
-//            bounds
-//                .height
-//                .and_then(|height| Some(Vec2::new(width, height)))
-//        }) {
-//            let bottom_left =
-//                -(anchor.as_vec() + 0.5) * bounds + (bounds.y - layout.size.y) * Vec2::Y;
-//            let transform = *gt * GlobalTransform::from_translation(bottom_left.extend(0.));
-//
-//            gizmos.rect_2d(
-//                Isometry2d::from_translation(
-//                    transform.translation().xy() * crate::RESOLUTION_SCALE,
-//                ),
-//                bounds / crate::RESOLUTION_SCALE,
-//                RED,
-//            );
-//        }
-//    }
-//}

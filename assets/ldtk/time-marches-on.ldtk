@@ -554,7 +554,7 @@
 						},
 						{
 							"__identifier": "Interaction",
-							"__grid": [1,1],
+							"__grid": [6,7],
 							"__pivot": [0.5,0.5],
 							"__tags": [],
 							"__tile": null,
@@ -563,7 +563,7 @@
 							"width": 16,
 							"height": 16,
 							"defUid": 8,
-							"px": [16,16],
+							"px": [96,112],
 							"fieldInstances": [
 								{ "__identifier": "flavor", "__type": "String", "__value": "You made it. Congrats!", "__tile": null, "defUid": 9, "realEditorValues": [{
 									"id": "V_String",
@@ -572,8 +572,8 @@
 								{ "__identifier": "width", "__type": "Float", "__value": 16, "__tile": null, "defUid": 11, "realEditorValues": [{ "id": "V_Float", "params": [16] }] },
 								{ "__identifier": "height", "__type": "Float", "__value": 16, "__tile": null, "defUid": 12, "realEditorValues": [] }
 							],
-							"__worldX": 16,
-							"__worldY": 16
+							"__worldX": 96,
+							"__worldY": 112
 						}
 					]
 				},
