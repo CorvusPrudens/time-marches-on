@@ -76,9 +76,11 @@ fn insert_animation_controller(
     for (entity, sprite) in sprites.iter() {
         if let Some(layout) = layouts.0.get(sprite.path).cloned() {
             let first = sprite.indices.seq[0];
+            let mut indices = sprite.indices.clone();
+            indices.index = 1;
 
             commands.entity(entity).insert((
-                AnimationController::from_seconds(sprite.indices.clone(), sprite.interval),
+                AnimationController::from_seconds(indices, sprite.interval),
                 Sprite::from_atlas_image(
                     server.load(sprite.path),
                     TextureAtlas {
@@ -111,7 +113,7 @@ impl AnimationController {
     }
 }
 
-#[derive(Clone, Component)]
+#[derive(Debug, Clone, Component)]
 pub struct AnimationIndices {
     mode: AnimationMode,
     index: usize,
@@ -154,8 +156,8 @@ impl AnimationIndices {
             }
             None => match self.mode {
                 AnimationMode::Repeat => {
-                    self.index = 0;
-                    self.seq.get(self.index).copied()
+                    self.index = 1;
+                    self.seq.get(0).copied()
                 }
                 AnimationMode::Once | AnimationMode::Despawn => None,
             },
@@ -163,7 +165,7 @@ impl AnimationIndices {
     }
 }
 
-#[derive(Clone, Copy, PartialEq, Eq)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum AnimationMode {
     Repeat,
     Once,

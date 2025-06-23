@@ -17,10 +17,11 @@ impl Plugin for PlayerPlugin {
     fn build(&self, app: &mut App) {
         app.add_input_context::<PlayerContext>()
             .register_layout(
-                "textures/main-character.png",
-                TextureAtlasLayout::from_grid(UVec2::splat(32), 12, 1, None, None),
+                "textures/player.png",
+                TextureAtlasLayout::from_grid(UVec2::splat(48), 12, 8, None, None),
             )
             .register_required_components::<world::PlayerVessel, Player>()
+            .add_systems(Update, scaled)
             .add_observer(bind)
             .add_observer(apply_movement)
             .add_observer(stop_movement)
@@ -36,6 +37,7 @@ impl Plugin for PlayerPlugin {
     Actions<PlayerContext>,
     PixelSnap,
     YOrigin(-8.),
+    Scaled(Vec2::splat(0.8)),
 )]
 #[component(on_insert = Self::bind_camera)]
 pub struct Player;
@@ -48,17 +50,23 @@ impl Player {
         world
             .commands()
             .entity(ctx.entity)
-            .insert(AnimationSprite::repeating(
-                "textures/main-character.png",
-                0.5,
-                0..1,
-            ))
+            .insert(AnimationSprite::repeating("textures/player.png", 0.0, [1]))
             .with_child((
                 CollisionLayers::new(Layer::Player, Layer::Default),
-                Collider::rectangle(8.0, 8.0),
-                Transform::from_xyz(0., -6., 0.),
+                Collider::circle(6.0),
+                Transform::from_xyz(0., -16., 0.),
                 PlayerCollider,
             ));
+    }
+}
+
+#[derive(Component)]
+struct Scaled(Vec2);
+
+fn scaled(mut commands: Commands, mut entities: Query<(Entity, &mut Transform, &Scaled)>) {
+    for (entity, mut transform, scaled) in entities.iter_mut() {
+        commands.entity(entity).remove::<Scaled>();
+        transform.scale = scaled.0.extend(1.);
     }
 }
 
@@ -118,22 +126,22 @@ fn move_sprite(
     };
 
     let range = match dir.to_array() {
-        [0.0, -1.0] => 1..3,
-        [0.0, 1.0] => 4..6,
-        [1.0, 0.0] => 7..9,
-        [-1.0, 0.0] => 10..12,
+        [0.0, -1.0] => [0, 2],
+        [0.0, 1.0] => [36, 38],
+        [1.0, 0.0] => [12, 14],
+        [-1.0, 0.0] => [24, 26],
         _ => unreachable!(),
     };
 
-    if player.is_some_and(|player| player.indices.seq[0] == range.start) {
+    if player.is_some_and(|player| player.indices.seq[0] == range[0]) {
         return;
     }
 
     commands
         .entity(trigger.target())
         .insert(AnimationSprite::repeating(
-            "textures/main-character.png",
-            0.2,
+            "textures/player.png",
+            0.4,
             range,
         ));
 }
@@ -159,6 +167,6 @@ fn stop_sprite(
     let (entity, mut sprite, animation) = player.into_inner();
     commands.entity(entity).remove::<AnimationController>();
     if let Some(atlas) = &mut sprite.texture_atlas {
-        atlas.index = animation.indices.seq[0] - 1;
+        atlas.index = animation.indices.seq[0] + 1;
     }
 }

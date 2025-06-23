@@ -279,7 +279,7 @@ pub fn spawn_textbox(server: Res<AssetServer>, mut commands: Commands) {
             Text2d::default(),
             TextFont {
                 font: server.load("fonts/raster-forge.ttf"),
-                font_size: 32.,
+                font_size: 42.,
                 ..Default::default()
             },
             TextBounds::new(bounds.x, bounds.y),
@@ -333,6 +333,7 @@ struct AwaitinputVisual;
 
 fn await_input_visual(trigger: Trigger<OnAdd, AwaitInput>, mut commands: Commands) {
     commands.entity(trigger.target()).with_child((
+        AwaitinputVisual,
         AnimationSprite::repeating("textures/textbox-await.png", 0.2, 0..4),
         Transform::from_xyz(0., 0., -1.).with_scale(Vec3::splat(crate::RESOLUTION_SCALE)),
         HIGH_RES_LAYER,
