@@ -175,7 +175,7 @@ pub struct TextboxContext;
 
 #[derive(Debug, InputAction)]
 #[input_action(output = bool, require_reset = true)]
-struct Interact;
+pub struct Interact;
 
 fn bind(
     trigger: Trigger<Binding<TextboxContext>>,

@@ -5,6 +5,7 @@ use avian2d::prelude::{Gravity, PhysicsLayer};
 use bevy::DefaultPlugins;
 use bevy::app::{App, FixedMainScheduleOrder};
 use bevy::asset::AssetMetaCheck;
+use bevy::ecs::query::QueryFilter;
 use bevy::ecs::schedule::ScheduleLabel;
 use bevy::log::{Level, LogPlugin};
 use bevy::prelude::*;
@@ -25,6 +26,7 @@ mod inventory;
 mod levels;
 mod loading;
 mod menu;
+mod notes;
 mod player;
 mod textbox;
 #[allow(unused)]
@@ -98,6 +100,7 @@ fn main() {
         animation::AnimationPlugin,
         hook::HookPlugin,
         cutscene::CutscenePlugin,
+        notes::NotesPlugin,
     ))
     .init_state::<GameState>()
     .add_sub_state::<PlayingState>()
@@ -159,6 +162,12 @@ impl Into<Color> for HexColor {
             (self.0 >> 8) as u8 & 0xFF,
             self.0 as u8,
         )
+    }
+}
+
+pub fn despawn_entities<F: QueryFilter>(mut commands: Commands, entities: Query<Entity, F>) {
+    for entity in entities.iter() {
+        commands.entity(entity).despawn();
     }
 }
 
