@@ -28,12 +28,14 @@ impl Plugin for TextboxPlugin {
                     None,
                 ),
             )
+            .init_resource::<TextboxSections>()
             .add_event::<TextboxEvent>()
-            .add_event::<TextboxClosedEvent>()
+            .add_event::<TextboxCloseInteraction>()
+            .add_event::<TextboxCloseEvent>()
             .init_resource::<GlyphReveal>()
-            .add_systems(Update, textbox_event)
+            .add_systems(Update, (textbox_event, close_textbox))
             .add_observer(bind)
-            .add_observer(close_textbox)
+            .add_observer(textbox_input)
             .add_observer(reveal_textbox);
     }
 }
@@ -44,7 +46,10 @@ pub fn glyph_sample(glyph: &'static str) -> String {
 
 /// Spawn a textbox and present each `TextBlurb` in sequence with breaks.
 #[derive(Event)]
-pub struct TextboxEvent(Vec<TextBlurb>);
+pub struct TextboxEvent {
+    blurbs: Vec<TextBlurb>,
+    despawn_when_finished: bool,
+}
 
 #[allow(unused)]
 impl TextboxEvent {
@@ -52,11 +57,21 @@ impl TextboxEvent {
         let sections = sections.into_iter().collect::<Vec<_>>();
         debug_assert!(!sections.is_empty());
 
-        Self(sections)
+        Self {
+            blurbs: sections,
+            despawn_when_finished: true,
+        }
     }
 
     pub fn section(section: TextBlurb) -> Self {
         Self::new([section])
+    }
+
+    pub fn section_retained(section: TextBlurb) -> Self {
+        Self {
+            blurbs: vec![section],
+            despawn_when_finished: false,
+        }
     }
 }
 
@@ -127,25 +142,33 @@ pub struct CharacterSpriteEntity;
 fn textbox_event(
     mut commands: Commands,
     mut reader: EventReader<TextboxEvent>,
-    textbox: Option<Single<&TextboxSections>>,
+    mut sections: ResMut<TextboxSections>,
     player: Single<Entity, With<Player>>,
+    textbox: Option<Single<&Textbox>>,
 ) -> Result {
-    if !reader.is_empty() && textbox.is_some() || reader.len() > 1 {
+    if !reader.is_empty() && !sections.sections.is_empty() || reader.len() > 1 {
         return Err("Received `TextboxEvent` while another event is being processed".into());
     }
 
     for event in reader.read() {
-        commands.spawn(TextboxSections(event.0.iter().cloned().rev().collect()));
+        sections.sections.extend(event.blurbs.iter().cloned().rev());
+        sections.despawn_when_finished = event.despawn_when_finished;
+
         commands.entity(*player).remove::<Actions<PlayerContext>>();
-        commands.run_system_cached(spawn_textbox);
+        if textbox.is_none() {
+            commands.run_system_cached(spawn_textbox);
+        }
         commands.run_system_cached(pop_next_section);
     }
 
     Ok(())
 }
 
-#[derive(Component)]
-struct TextboxSections(Vec<TextBlurb>);
+#[derive(Default, Resource)]
+struct TextboxSections {
+    sections: Vec<TextBlurb>,
+    despawn_when_finished: bool,
+}
 
 #[derive(InputContext)]
 pub struct TextboxContext;
@@ -166,35 +189,50 @@ fn bind(
         .with_conditions(JustPress::default());
 }
 
-/// An event emitted when a textbox is closed by the user.
+/// An event emitted when the user interacts with a textbox awaiting input.
 #[derive(Debug, Event)]
-pub struct TextboxClosedEvent;
+pub struct TextboxCloseInteraction;
 
 #[derive(Component)]
 struct AwaitInput;
 
-fn close_textbox(
+fn textbox_input(
     _: Trigger<Fired<Interact>>,
     mut commands: Commands,
-    textbox: Single<Entity, With<AwaitInput>>,
-    sections: Single<(Entity, &TextboxSections)>,
-    player: Single<Entity, With<Player>>,
-    mut writer: EventWriter<TextboxClosedEvent>,
+    sections: Res<TextboxSections>,
+    mut writer: EventWriter<TextboxCloseInteraction>,
+    mut close: EventWriter<TextboxCloseEvent>,
+
+    _textbox: Single<&AwaitInput>,
 ) {
-    let (entity, sections) = sections.into_inner();
-    match sections.0.is_empty() {
+    match sections.sections.is_empty() {
         false => {
             commands.run_system_cached(pop_next_section);
         }
         true => {
-            commands.entity(*textbox).despawn();
-            commands.entity(entity).despawn();
-            commands
-                .entity(*player)
-                .insert(Actions::<PlayerContext>::default());
+            if sections.despawn_when_finished {
+                close.write(TextboxCloseEvent);
+            }
 
-            writer.write(TextboxClosedEvent);
+            writer.write(TextboxCloseInteraction);
         }
+    }
+}
+
+#[derive(Event)]
+pub struct TextboxCloseEvent;
+
+fn close_textbox(
+    mut commands: Commands,
+    mut reader: EventReader<TextboxCloseEvent>,
+    textbox: Single<Entity, With<Textbox>>,
+    player: Single<Entity, With<Player>>,
+) {
+    for _ in reader.read() {
+        commands.entity(*textbox).despawn();
+        commands
+            .entity(*player)
+            .insert(Actions::<PlayerContext>::default());
     }
 }
 
@@ -259,13 +297,13 @@ pub fn spawn_textbox(server: Res<AssetServer>, mut commands: Commands) {
 fn pop_next_section(
     mut commands: Commands,
     server: Res<AssetServer>,
-    mut sections: Single<&mut TextboxSections>,
+    mut sections: ResMut<TextboxSections>,
     mut reveal: ResMut<GlyphReveal>,
     text: Single<(Entity, &mut Text2d), With<TextboxText>>,
     textbox: Single<Entity, With<Textbox>>,
     old_character: Option<Single<Entity, With<CharacterSpriteEntity>>>,
 ) {
-    let section = sections.0.pop().unwrap();
+    let section = sections.sections.pop().unwrap();
     reveal.0 = Some(section.glyph.clone());
 
     if let Some(old_character) = old_character {

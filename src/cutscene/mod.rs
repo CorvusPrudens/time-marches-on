@@ -7,7 +7,7 @@ use bevy_sequence::{
 use fragments::IntoBox;
 use std::{any::TypeId, collections::VecDeque, time::Duration};
 
-use crate::textbox::{TextBlurb, TextboxClosedEvent, TextboxEvent};
+use crate::textbox::{TextBlurb, TextboxCloseInteraction, TextboxEvent};
 
 mod fragments;
 mod movement;
@@ -62,14 +62,14 @@ fn fragment_bridge_start(
 ) {
     for event in fragment_events.read() {
         ids.0.push_back(event.end());
-        textbox.write(TextboxEvent::section(TextBlurb::main_character(
+        textbox.write(TextboxEvent::section_retained(TextBlurb::main_character(
             event.data.section.clone(),
         )));
     }
 }
 
 fn fragment_bridge_end(
-    mut text_end: EventReader<TextboxClosedEvent>,
+    mut text_end: EventReader<TextboxCloseInteraction>,
     mut fragment_end: EventWriter<FragmentEndEvent>,
 
     mut ids: ResMut<FragmentEndEvents>,

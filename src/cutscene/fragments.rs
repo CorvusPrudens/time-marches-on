@@ -2,14 +2,10 @@ use bevy::prelude::*;
 use bevy_sequence::{fragment::DataLeaf, prelude::*};
 use std::marker::PhantomData;
 
+use crate::textbox::TextboxCloseEvent;
+
 pub trait IntoBox<C = EmptyCutscene>: IntoFragment<SectionFrag, TextBoxContext<C>> {
     fn spawn_box(self, commands: &mut Commands);
-    // fn spawn_box_with(self, commands: &mut Commands, _root: C);
-    // fn textbox(self) -> impl IntoBox<C>;
-    // fn textbox_with(
-    //     self,
-    //     f: impl Fn(Res<AssetServer>, &mut Commands) + 'static + Send + Sync,
-    // ) -> impl IntoBox<C>;
 }
 
 impl<C, T> IntoBox<C> for T
@@ -18,34 +14,14 @@ where
     C: 'static,
 {
     fn spawn_box(self, commands: &mut Commands) {
-        spawn_root_with(self, commands, TextBoxContext::new());
+        spawn_root_with(
+            self.on_end(|mut writer: EventWriter<TextboxCloseEvent>| {
+                writer.write(TextboxCloseEvent);
+            }),
+            commands,
+            TextBoxContext::new(),
+        );
     }
-
-    // fn spawn_box_with(self, commands: &mut Commands, _root: C) {
-    //     self.spawn_box(commands);
-    // }
-    //
-    // fn textbox(self) -> impl IntoBox<C> {
-    //     self.textbox_with(crate::textbox::spawn_textbox)
-    // }
-    //
-    // fn textbox_with(
-    //     self,
-    //     f: impl Fn(Res<AssetServer>, &mut Commands) + 'static + Send + Sync,
-    // ) -> impl IntoBox<C> {
-    //     self.on_start(
-    //         move |InRef(ctx): InRef<TextBoxContext<C>>,
-    //               mut commands: Commands,
-    //               asset_server: Res<AssetServer>| {
-    //             f(asset_server, &mut commands);
-    //         },
-    //     )
-    //     .on_end(
-    //         |InRef(ctx): InRef<TextBoxContext<C>>, mut commands: Commands| {
-    //             todo!();
-    //         },
-    //     )
-    // }
 }
 
 #[derive(Debug, Component)]
@@ -63,15 +39,6 @@ impl<C> Clone for TextBoxContext<C> {
 impl<C> TextBoxContext<C> {
     pub fn new() -> Self {
         Self(PhantomData)
-    }
-}
-
-#[derive(Debug, Clone, Component)]
-pub struct TextBoxEntity(Entity);
-
-impl TextBoxEntity {
-    pub fn entity(&self) -> Entity {
-        self.0
     }
 }
 
@@ -101,4 +68,3 @@ macro_rules! impl_into_frag {
 
 impl_into_frag!(&'static str, slf, slf.into());
 impl_into_frag!(String, slf, slf.into());
-// impl_into_frag!(TypeWriterSection, slf, slf);
