@@ -15,8 +15,8 @@ use std::io::Cursor;
 use winit::window::Icon;
 
 mod animation;
-// mod cutscene;
 mod callback;
+mod cutscene;
 mod entities;
 mod fragments;
 mod hook;
@@ -97,6 +97,7 @@ fn main() {
         entities::EntityPlugin,
         animation::AnimationPlugin,
         hook::HookPlugin,
+        cutscene::CutscenePlugin,
     ))
     .init_state::<GameState>()
     .add_sub_state::<PlayingState>()

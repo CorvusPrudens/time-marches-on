@@ -214,7 +214,7 @@ struct Textbox;
 #[derive(Component)]
 struct TextboxText;
 
-fn spawn_textbox(mut commands: Commands, server: Res<AssetServer>) {
+pub fn spawn_textbox(server: Res<AssetServer>, mut commands: Commands) {
     let bounds = Vec2::new(
         crate::WIDTH * crate::RESOLUTION_SCALE - 80.,
         crate::HEIGHT * crate::RESOLUTION_SCALE / 3.,

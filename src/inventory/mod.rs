@@ -157,7 +157,7 @@ fn setup_ui(
                 ..default()
             },
             children![(
-                Text::new("Inventory"),
+                Text::new("Pockets"),
                 TextFont {
                     font: server.load("fonts/raster-forge.ttf"),
                     ..Default::default()

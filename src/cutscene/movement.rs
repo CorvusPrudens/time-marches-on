@@ -6,13 +6,15 @@ use std::any::TypeId;
 use std::marker::PhantomData;
 use std::time::Duration;
 
+use super::{IntoCurve, fragments::IntoBox};
+
 /// This is applied to entities whose movement should be handled
 /// purely by cutscene directives.
 #[derive(Debug, Clone, Copy, Component)]
 pub struct CutsceneMovement;
 
 #[derive(Debug, Clone, Component)]
-struct MovementClip<C> {
+pub struct MovementClip<C> {
     timer: Timer,
     curve: C,
 }
