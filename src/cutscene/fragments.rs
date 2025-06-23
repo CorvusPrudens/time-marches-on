@@ -1,30 +1,6 @@
-// use super::{Continue, TextBox};
-use crate::{HEIGHT, WIDTH, textbox::TextBlurb};
 use bevy::prelude::*;
-use bevy::sprite::Anchor;
-use bevy::text::TextBounds;
 use bevy_sequence::{fragment::DataLeaf, prelude::*};
-// use portrait::{Portrait, TextBoxPortrait};
 use std::marker::PhantomData;
-
-pub fn textbox_once<C: 'static>(section: impl IntoBox<C>, commands: &mut Commands) {
-    section
-        .once()
-        .eval_id(
-            |In(fragment): In<FragmentId>,
-             //mut commands: Commands,
-             frag_query: Query<&FragmentState>| {
-                if let Ok(state) = frag_query.get(fragment.entity()) {
-                    !(state.completed > 0 || state.active)
-                    // TODO: despawn crashes
-                    //commands.entity(fragment.entity()).despawn();
-                } else {
-                    false
-                }
-            },
-        )
-        .spawn_box(commands);
-}
 
 pub trait IntoBox<C = EmptyCutscene>: IntoFragment<SectionFrag, TextBoxContext<C>> {
     fn spawn_box(self, commands: &mut Commands);
