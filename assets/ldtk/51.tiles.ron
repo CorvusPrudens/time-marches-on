@@ -132,6 +132,30 @@
                 )),
             ),
             (
+                xy: (352.0, 144.0),
+                index: 121,
+                sprite: Some((
+                    flip_x: false,
+                    flip_y: false,
+                )),
+            ),
+            (
+                xy: (368.0, 144.0),
+                index: 121,
+                sprite: Some((
+                    flip_x: false,
+                    flip_y: false,
+                )),
+            ),
+            (
+                xy: (384.0, 144.0),
+                index: 121,
+                sprite: Some((
+                    flip_x: false,
+                    flip_y: false,
+                )),
+            ),
+            (
                 xy: (416.0, 144.0),
                 index: 121,
                 sprite: Some((
@@ -508,6 +532,46 @@
                 )),
             ),
             (
+                xy: (384.0, 240.0),
+                index: 121,
+                sprite: Some((
+                    flip_x: false,
+                    flip_y: false,
+                )),
+            ),
+            (
+                xy: (400.0, 240.0),
+                index: 121,
+                sprite: Some((
+                    flip_x: false,
+                    flip_y: false,
+                )),
+            ),
+            (
+                xy: (416.0, 240.0),
+                index: 121,
+                sprite: Some((
+                    flip_x: false,
+                    flip_y: false,
+                )),
+            ),
+            (
+                xy: (432.0, 240.0),
+                index: 121,
+                sprite: Some((
+                    flip_x: false,
+                    flip_y: false,
+                )),
+            ),
+            (
+                xy: (448.0, 240.0),
+                index: 121,
+                sprite: Some((
+                    flip_x: false,
+                    flip_y: false,
+                )),
+            ),
+            (
                 xy: (528.0, 240.0),
                 index: 121,
                 sprite: Some((
@@ -549,6 +613,14 @@
             ),
             (
                 xy: (368.0, 256.0),
+                index: 121,
+                sprite: Some((
+                    flip_x: false,
+                    flip_y: false,
+                )),
+            ),
+            (
+                xy: (384.0, 256.0),
                 index: 121,
                 sprite: Some((
                     flip_x: false,
@@ -868,6 +940,22 @@
                 )),
             ),
             (
+                xy: (448.0, 336.0),
+                index: 121,
+                sprite: Some((
+                    flip_x: false,
+                    flip_y: false,
+                )),
+            ),
+            (
+                xy: (464.0, 336.0),
+                index: 121,
+                sprite: Some((
+                    flip_x: false,
+                    flip_y: false,
+                )),
+            ),
+            (
                 xy: (512.0, 336.0),
                 index: 121,
                 sprite: Some((
@@ -884,6 +972,14 @@
                 )),
             ),
             (
+                xy: (144.0, 352.0),
+                index: 121,
+                sprite: Some((
+                    flip_x: false,
+                    flip_y: false,
+                )),
+            ),
+            (
                 xy: (256.0, 352.0),
                 index: 121,
                 sprite: Some((
@@ -893,6 +989,14 @@
             ),
             (
                 xy: (368.0, 352.0),
+                index: 121,
+                sprite: Some((
+                    flip_x: false,
+                    flip_y: false,
+                )),
+            ),
+            (
+                xy: (496.0, 352.0),
                 index: 121,
                 sprite: Some((
                     flip_x: false,
@@ -925,6 +1029,14 @@
             ),
             (
                 xy: (368.0, 368.0),
+                index: 121,
+                sprite: Some((
+                    flip_x: false,
+                    flip_y: false,
+                )),
+            ),
+            (
+                xy: (496.0, 368.0),
                 index: 121,
                 sprite: Some((
                     flip_x: false,
@@ -997,6 +1109,22 @@
             ),
             (
                 xy: (368.0, 384.0),
+                index: 121,
+                sprite: Some((
+                    flip_x: false,
+                    flip_y: false,
+                )),
+            ),
+            (
+                xy: (448.0, 384.0),
+                index: 121,
+                sprite: Some((
+                    flip_x: false,
+                    flip_y: false,
+                )),
+            ),
+            (
+                xy: (464.0, 384.0),
                 index: 121,
                 sprite: Some((
                     flip_x: false,
@@ -1931,6 +2059,38 @@
                 )),
             ),
             (
+                xy: (384.0, 96.0),
+                index: 54,
+                sprite: Some((
+                    flip_x: false,
+                    flip_y: false,
+                )),
+            ),
+            (
+                xy: (400.0, 96.0),
+                index: 55,
+                sprite: Some((
+                    flip_x: false,
+                    flip_y: false,
+                )),
+            ),
+            (
+                xy: (432.0, 128.0),
+                index: 180,
+                sprite: Some((
+                    flip_x: false,
+                    flip_y: false,
+                )),
+            ),
+            (
+                xy: (448.0, 128.0),
+                index: 181,
+                sprite: Some((
+                    flip_x: false,
+                    flip_y: false,
+                )),
+            ),
+            (
                 xy: (480.0, 128.0),
                 index: 455,
                 sprite: Some((
@@ -1963,6 +2123,22 @@
                 )),
             ),
             (
+                xy: (128.0, 224.0),
+                index: 54,
+                sprite: Some((
+                    flip_x: false,
+                    flip_y: false,
+                )),
+            ),
+            (
+                xy: (144.0, 224.0),
+                index: 55,
+                sprite: Some((
+                    flip_x: false,
+                    flip_y: false,
+                )),
+            ),
+            (
                 xy: (176.0, 224.0),
                 index: 476,
                 sprite: Some((
@@ -1973,6 +2149,22 @@
             (
                 xy: (192.0, 224.0),
                 index: 477,
+                sprite: Some((
+                    flip_x: false,
+                    flip_y: false,
+                )),
+            ),
+            (
+                xy: (224.0, 224.0),
+                index: 54,
+                sprite: Some((
+                    flip_x: false,
+                    flip_y: false,
+                )),
+            ),
+            (
+                xy: (240.0, 224.0),
+                index: 55,
                 sprite: Some((
                     flip_x: false,
                     flip_y: false,

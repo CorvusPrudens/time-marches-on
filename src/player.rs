@@ -35,9 +35,7 @@ impl Plugin for PlayerPlugin {
     LockedAxes::ROTATION_LOCKED,
     Actions<PlayerContext>,
     PixelSnap,
-    Collider::rectangle(8.0, 16.0),
-    CollisionLayers::new(Layer::Player, Layer::Default),
-    YOrigin(-0.),
+    YOrigin(-8.),
 )]
 #[component(on_insert = Self::bind_camera)]
 pub struct Player;
@@ -54,9 +52,18 @@ impl Player {
                 "textures/main-character.png",
                 0.5,
                 0..1,
+            ))
+            .with_child((
+                CollisionLayers::new(Layer::Player, Layer::Default),
+                Collider::rectangle(8.0, 8.0),
+                Transform::from_xyz(0., -6., 0.),
+                PlayerCollider,
             ));
     }
 }
+
+#[derive(Component)]
+pub struct PlayerCollider;
 
 #[derive(InputContext)]
 pub struct PlayerContext;

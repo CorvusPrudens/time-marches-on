@@ -18,7 +18,7 @@ use bevy_tween::tween::IntoTarget;
 
 use crate::callback::Callback;
 use crate::interactions::InteractAction;
-use crate::player::{Player, PlayerContext};
+use crate::player::{Player, PlayerCollider, PlayerContext};
 use crate::textbox::{TextBlurb, TextboxEvent};
 use crate::{GameState, HexColor, Layer, TILE_SIZE, world};
 
@@ -191,14 +191,13 @@ fn door(
     side_doors2: Query<(&world::SideDoor2, &CollidingEntities, &ChildOf)>,
 
     player: Single<(Entity, &mut Transform), With<Player>>,
+    player_collider: Single<Entity, With<PlayerCollider>>,
     transforms: Query<&GlobalTransform>,
     mut writer: EventWriter<TextboxEvent>,
 
     mut commands: Commands,
     server: Res<AssetServer>,
 ) -> Result {
-    let (entity, _) = player.into_inner();
-
     for (target, child_of) in doors
         .iter()
         .map(|(door, colliding, child_of)| (door.target, colliding, child_of))
@@ -213,14 +212,16 @@ fn door(
                 .map(|(door, colliding, child_of)| (door.target, colliding, child_of)),
         )
         .filter_map(|(target, colliding, child_of)| {
-            colliding.contains(&entity).then_some((target, child_of))
+            colliding
+                .contains(&*player_collider)
+                .then_some((target, child_of))
         })
     {
         match target {
             Some(target) => {
                 let level_t = transforms.get(child_of.parent())?.translation();
 
-                commands.entity(entity).remove::<Actions<PlayerContext>>();
+                commands.entity(player.0).remove::<Actions<PlayerContext>>();
                 commands.spawn(
                     SamplePlayer::new(server.load("audio/sfx/door.wav"))
                         .with_volume(Volume::Decibels(-12.0)),
