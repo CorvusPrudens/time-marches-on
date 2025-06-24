@@ -1,3 +1,5 @@
+use std::time::Duration;
+
 use avian2d::prelude::*;
 use bevy::ecs::component::HookContext;
 use bevy::ecs::world::DeferredWorld;
@@ -5,6 +7,8 @@ use bevy::prelude::*;
 use bevy_enhanced_input::prelude::*;
 use bevy_optix::camera::PixelSnap;
 use bevy_optix::zorder::YOrigin;
+use bevy_seedling::prelude::*;
+use rand::Rng;
 
 use crate::animation::{AnimationAppExt, AnimationController, AnimationSprite};
 use crate::{Layer, world};
@@ -21,7 +25,7 @@ impl Plugin for PlayerPlugin {
                 TextureAtlasLayout::from_grid(UVec2::splat(48), 12, 8, None, None),
             )
             .register_required_components::<world::PlayerVessel, Player>()
-            .add_systems(Update, scaled)
+            .add_systems(Update, (scaled, play_footsteps))
             .add_observer(bind)
             .add_observer(apply_movement)
             .add_observer(stop_movement)
@@ -46,8 +50,9 @@ pub fn add_actions(mut commands: Commands, player: Single<Entity, With<Player>>)
     LockedAxes::ROTATION_LOCKED,
     Actions<PlayerContext>,
     PixelSnap,
-    YOrigin(-8.),
+    YOrigin(-12.),
     Scaled(Vec2::splat(0.8)),
+    FootstepTimer(Timer::new(Duration::from_millis(750), TimerMode::Repeating))
 )]
 #[component(on_insert = Self::bind_camera)]
 pub struct Player;
@@ -115,6 +120,43 @@ fn apply_movement(
     mut velocity: Single<&mut LinearVelocity, (With<Player>, Without<BlockControls>)>,
 ) {
     velocity.0 = trigger.value.clamp_length(0., 1.) * PLAYER_SPEED;
+}
+
+#[derive(Component)]
+struct FootstepTimer(Timer);
+
+fn play_footsteps(
+    player: Single<(&mut FootstepTimer, &LinearVelocity), With<Player>>,
+    mut commands: Commands,
+    server: Res<AssetServer>,
+    time: Res<Time>,
+    mut is_moving: Local<bool>,
+) {
+    let (mut timer, velocity) = player.into_inner();
+
+    if velocity.length() == 0.0 {
+        timer.0.reset();
+        *is_moving = false;
+        return;
+    }
+
+    let just_started = !*is_moving;
+    *is_moving = true;
+
+    if timer.0.tick(time.delta()).just_finished() || just_started {
+        let mut rng = rand::thread_rng();
+
+        let sample = if rng.gen_bool(0.5) {
+            "audio/sfx/step1.wav"
+        } else {
+            "audio/sfx/step2.wav"
+        };
+
+        commands.spawn((
+            SamplePlayer::new(server.load(sample)).with_volume(Volume::Decibels(-6.0)),
+            PitchRange::new(0.075),
+        ));
+    }
 }
 
 fn move_sprite(

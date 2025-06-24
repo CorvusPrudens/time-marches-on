@@ -16,6 +16,7 @@ use std::io::Cursor;
 use winit::window::Icon;
 
 mod animation;
+mod audio;
 mod callback;
 mod cutscene;
 mod entities;
@@ -101,6 +102,7 @@ fn main() {
         hook::HookPlugin,
         cutscene::CutscenePlugin,
         notes::NotesPlugin,
+        audio::AudioPlugin,
     ))
     .init_state::<GameState>()
     .add_sub_state::<PlayingState>()
