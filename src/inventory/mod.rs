@@ -12,7 +12,7 @@ use bevy_enhanced_input::prelude::{Actions, InputContextAppExt};
 use crate::player::{Player, PlayerContext};
 
 mod input;
-mod item;
+pub mod item;
 mod pause;
 mod scroll;
 

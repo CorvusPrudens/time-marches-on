@@ -4,6 +4,7 @@ use bevy::prelude::*;
 use bevy_enhanced_input::events::Fired;
 use bevy_enhanced_input::prelude::Actions;
 use bevy_optix::pixel_perfect::HIGH_RES_LAYER;
+use bevy_seedling::prelude::*;
 use bevy_sequence::combinators::delay::run_after;
 use bevy_tween::interpolate::{sprite_color, translation};
 use bevy_tween::prelude::{AnimationBuilderExt, EaseKind};
@@ -35,6 +36,9 @@ struct Fade;
 #[derive(Component)]
 struct TheNote;
 
+#[derive(Component)]
+struct Entered;
+
 fn note_event(
     mut commands: Commands,
     mut reader: EventReader<NoteEvent>,
@@ -49,6 +53,7 @@ fn note_event(
     debug_assert!(reader.is_empty());
     reader.clear();
 
+    commands.spawn(Entered);
     commands.entity(*player).remove::<Actions<PlayerContext>>();
 
     let entity = commands.spawn_empty().id();
@@ -91,17 +96,34 @@ fn note_event(
             )),
         );
 
-    commands
-        .spawn((Actions::<TextboxContext>::default(), Note))
-        .observe(exit);
+    commands.spawn(SamplePlayer {
+        sample: server.load("audio/sfx/paper.wav"),
+        volume: Volume::Linear(0.8),
+        ..Default::default()
+    });
+
+    run_after(
+        Duration::from_secs_f32(SLIDE_DUR.max(FADE_DUR)),
+        |mut commands: Commands| {
+            commands
+                .spawn((Actions::<TextboxContext>::default(), Note))
+                .observe(exit);
+        },
+        &mut commands,
+    );
 }
 
 fn exit(
     _: Trigger<Fired<Interact>>,
     mut commands: Commands,
+    server: Res<AssetServer>,
     fade: Single<Entity, With<Fade>>,
     note: Single<Entity, With<TheNote>>,
+
+    entered: Single<Entity, With<Entered>>,
 ) {
+    commands.entity(*entered).despawn();
+
     commands.entity(*fade).animation().insert_tween_here(
         Duration::from_secs_f32(FADE_DUR),
         EaseKind::Linear,
@@ -117,6 +139,12 @@ fn exit(
             Vec3::new(0., -crate::HEIGHT * crate::RESOLUTION_SCALE, 901.0),
         )),
     );
+
+    commands.spawn(SamplePlayer {
+        sample: server.load("audio/sfx/paper-away.wav"),
+        volume: Volume::Linear(0.5),
+        ..Default::default()
+    });
 
     run_after(
         Duration::from_secs_f32(SLIDE_DUR.max(FADE_DUR)),

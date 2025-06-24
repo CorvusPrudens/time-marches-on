@@ -1,16 +1,12 @@
 use bevy::prelude::*;
 use bevy_sequence::{
     Threaded,
-    combinators::delay::run_after,
     prelude::{FragmentEndEvent, FragmentEvent, FragmentExt},
 };
 use fragments::IntoBox;
-use std::{any::TypeId, collections::VecDeque, time::Duration};
+use std::{any::TypeId, collections::VecDeque};
 
-use crate::{
-    notes::NoteEvent,
-    textbox::{TextBlurb, TextboxCloseInteraction, TextboxEvent},
-};
+use crate::textbox::{TextBlurb, TextboxCloseInteraction, TextboxEvent};
 
 mod fragments;
 mod movement;
@@ -37,16 +33,7 @@ impl Plugin for CutscenePlugin {
             .add_systems(
                 PostUpdate,
                 fragment_bridge_end.before(bevy_sequence::SequenceSets::Respond),
-            )
-            .add_systems(Startup, |mut commands: Commands| {
-                run_after(
-                    Duration::from_millis(500),
-                    |mut writer: EventWriter<NoteEvent>| {
-                        writer.write(NoteEvent("pills1.png"));
-                    },
-                    &mut commands,
-                );
-            });
+            );
     }
 }
 

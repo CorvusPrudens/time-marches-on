@@ -1,17 +1,66 @@
-use avian2d::prelude::{Collider, Collisions, Sensor};
+use avian2d::prelude::*;
 use bevy::prelude::*;
 use bevy_enhanced_input::prelude::*;
 
-use crate::player::PlayerContext;
+use crate::player::{PlayerCollider, PlayerContext};
 use crate::textbox::{TextBlurb, TextboxEvent};
 
 pub struct InteractionPlugin;
 
 impl Plugin for InteractionPlugin {
     fn build(&self, app: &mut App) {
-        app.add_systems(Update, interact_collider)
+        app.add_systems(Last, remove_interacted)
+            .add_systems(Update, interact_collider)
             .add_observer(interact)
+            .add_observer(interactable)
             .add_observer(bind);
+    }
+}
+
+/// Checks for interactions from the player.
+///
+/// Inserts `Interacted` for one frame.
+#[derive(Default, Component)]
+#[require(Sensor, CollidingEntities)]
+pub struct Interactable;
+
+/// Marks an entity as being in an active interaction.
+///
+/// Lasts one frame.
+#[derive(Component)]
+pub struct Interacted;
+
+fn interactable(
+    _: Trigger<Fired<InteractAction>>,
+    mut commands: Commands,
+    player: Single<(Entity, &Transform), With<PlayerCollider>>,
+    interactables: Query<(Entity, &GlobalTransform, &CollidingEntities), With<Interactable>>,
+) {
+    let (player, transform) = player.into_inner();
+
+    let mut interactions = interactables
+        .iter()
+        .filter(|(_, _, colliding)| colliding.contains(&player))
+        .collect::<Vec<_>>();
+    interactions.sort_unstable_by(|(_, gt1, _), (_, gt2, _)| {
+        gt1.translation()
+            .xy()
+            .distance_squared(transform.translation.xy())
+            .total_cmp(
+                &gt2.translation()
+                    .xy()
+                    .distance_squared(transform.translation.xy()),
+            )
+    });
+
+    if let Some((entity, _, _)) = interactions.first() {
+        commands.entity(*entity).insert(Interacted);
+    }
+}
+
+fn remove_interacted(mut commands: Commands, entities: Query<Entity, With<Interacted>>) {
+    for entity in entities.iter() {
+        commands.entity(entity).remove::<Interacted>();
     }
 }
 

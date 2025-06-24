@@ -22,14 +22,22 @@ use crate::player::{Player, PlayerCollider, PlayerContext};
 use crate::textbox::{TextBlurb, TextboxEvent};
 use crate::{GameState, HexColor, Layer, TILE_SIZE, world};
 
+mod pills;
+
 pub struct LevelPlugin;
 
 impl Plugin for LevelPlugin {
     fn build(&self, app: &mut App) {
-        app.register_required_components::<world::Teleport, Teleporter>()
-            .register_required_components::<world::Door, Door>()
+        app.add_plugins(pills::PillsPlugin)
+            .register_required_components::<world::Teleport, Teleporter>()
+            .register_required_components::<world::LunaDoor, Door>()
+            .register_required_components::<world::HallDoor1, Door>()
+            .register_required_components::<world::HallDoor2, Door>()
             .register_required_components::<world::SideDoor1, Door>()
             .register_required_components::<world::SideDoor2, Door>()
+            .register_required_components::<world::BathroomDoor, Door>()
+            .register_required_components::<world::BathroomExitDoor, Door>()
+            .register_required_components::<world::CrackedSideDoor1, Door>()
             .add_systems(Update, (add_tile_collision, manage_transitions))
             .add_systems(OnEnter(GameState::Playing), load_ldtk)
             .add_observer(teleport)
@@ -186,9 +194,14 @@ struct Door;
 fn door(
     _: Trigger<Fired<InteractAction>>,
 
-    doors: Query<(&world::Door, &CollidingEntities, &ChildOf)>,
+    luna_door: Query<(&world::LunaDoor, &CollidingEntities, &ChildOf)>,
+    hall_doors1: Query<(&world::HallDoor1, &CollidingEntities, &ChildOf)>,
+    hall_doors2: Query<(&world::HallDoor2, &CollidingEntities, &ChildOf)>,
     side_doors1: Query<(&world::SideDoor1, &CollidingEntities, &ChildOf)>,
     side_doors2: Query<(&world::SideDoor2, &CollidingEntities, &ChildOf)>,
+    bathroom_door1: Query<(&world::BathroomDoor, &CollidingEntities, &ChildOf)>,
+    bathroom_door2: Query<(&world::BathroomExitDoor, &CollidingEntities, &ChildOf)>,
+    cracked_side_door1: Query<(&world::CrackedSideDoor1, &CollidingEntities, &ChildOf)>,
 
     player: Single<(Entity, &mut Transform), With<Player>>,
     player_collider: Single<Entity, With<PlayerCollider>>,
@@ -198,23 +211,48 @@ fn door(
     mut commands: Commands,
     server: Res<AssetServer>,
 ) -> Result {
-    for (target, child_of) in doors
+    for (target, child_of, luna) in bathroom_door1
         .iter()
-        .map(|(door, colliding, child_of)| (door.target, colliding, child_of))
+        .map(|(door, colliding, child_of)| (door.target, colliding, child_of, false))
+        .chain(
+            bathroom_door2
+                .iter()
+                .map(|(door, colliding, child_of)| (door.target, colliding, child_of, false)),
+        )
+        .chain(
+            luna_door
+                .iter()
+                .map(|(door, colliding, child_of)| (door.target, colliding, child_of, true)),
+        )
         .chain(
             side_doors1
                 .iter()
-                .map(|(door, colliding, child_of)| (door.target, colliding, child_of)),
+                .map(|(door, colliding, child_of)| (door.target, colliding, child_of, false)),
         )
         .chain(
             side_doors2
                 .iter()
-                .map(|(door, colliding, child_of)| (door.target, colliding, child_of)),
+                .map(|(door, colliding, child_of)| (door.target, colliding, child_of, false)),
         )
-        .filter_map(|(target, colliding, child_of)| {
+        .chain(
+            hall_doors1
+                .iter()
+                .map(|(door, colliding, child_of)| (door.target, colliding, child_of, false)),
+        )
+        .chain(
+            hall_doors2
+                .iter()
+                .map(|(door, colliding, child_of)| (door.target, colliding, child_of, false)),
+        )
+        .chain(
+            cracked_side_door1
+                .iter()
+                .map(|(door, colliding, child_of)| (door.target, colliding, child_of, false)),
+        )
+        .filter_map(|(target, colliding, child_of, luna)| {
             colliding
                 .contains(&*player_collider)
-                .then_some((target, child_of))
+                .then_some((target, child_of, luna))
         })
     {
         match target {
@@ -241,7 +279,14 @@ fn door(
                 ));
             }
             None => {
-                writer.write(TextboxEvent::section(TextBlurb::narrator("Locked...")));
+                commands.spawn(SamplePlayer {
+                    sample: server.load("audio/sfx/door-handle.wav"),
+                    volume: Volume::Linear(0.5),
+                    ..Default::default()
+                });
+                if luna {
+                    writer.write(TextboxEvent::section(TextBlurb::narrator("Locked...")));
+                }
             }
         }
     }
