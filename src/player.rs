@@ -52,7 +52,8 @@ pub fn add_actions(mut commands: Commands, player: Single<Entity, With<Player>>)
     PixelSnap,
     YOrigin(-12.),
     Scaled(Vec2::splat(0.8)),
-    FootstepTimer(Timer::new(Duration::from_millis(750), TimerMode::Repeating))
+    FootstepTimer(Timer::new(Duration::from_millis(750), TimerMode::Repeating)),
+    SpatialListener2D,
 )]
 #[component(on_insert = Self::bind_camera)]
 pub struct Player;

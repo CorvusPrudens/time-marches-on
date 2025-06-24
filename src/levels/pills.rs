@@ -160,13 +160,21 @@ fn trash(
                 commands
                     .entity(entity)
                     .remove::<ColliderDisabled>()
-                    .insert(Visibility::Visible);
+                    .insert((
+                        Visibility::Visible,
+                        // spatializing sound on door
+                        PlaybackSettings {
+                            on_complete: OnComplete::Remove,
+                            ..Default::default()
+                        },
+                        SamplePlayer {
+                            sample: server.load("audio/sfx/door-open.wav"),
+                            //volume: Volume::Linear(1.25),
+                            ..Default::default()
+                        },
+                        crate::audio::SpatialSound,
+                    ));
             }
-            commands.spawn(SamplePlayer {
-                sample: server.load("audio/sfx/door-open.wav"),
-                //volume: Volume::Linear(1.25),
-                ..Default::default()
-            });
 
             id.0 += 1;
         },
