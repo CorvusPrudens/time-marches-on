@@ -2,6 +2,8 @@ use bevy::prelude::*;
 use bevy_sequence::combinators::delay::run_after;
 use std::time::Duration;
 
+use crate::cutscene::fragments::IntoBox;
+
 pub mod tea;
 pub mod visitor;
 
@@ -14,7 +16,7 @@ impl Plugin for CutscenePlugin {
             run_after(
                 Duration::from_secs(2),
                 |mut commands: Commands| {
-                    // tea_cutscene().spawn_box(&mut commands);
+                    // tea::tea_cutscene().spawn_box(&mut commands);
                 },
                 &mut commands,
             );

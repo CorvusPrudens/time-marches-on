@@ -58,7 +58,7 @@ impl Chara {
             }),
             Self::Stranger => Arc::new(move |commands, server| {
                 commands.spawn((
-                    PitchRange::new(0.05),
+                    PitchRange(0.75..0.85),
                     SamplePlayer {
                         sample: server.load(glyph_sample("low.wav")),
                         volume: Volume::Linear(0.5),
