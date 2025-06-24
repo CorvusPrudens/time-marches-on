@@ -22,13 +22,13 @@ impl Plugin for PillsPlugin {
         app.register_required_components::<world::Pills, Pills>()
             .register_required_components::<world::PillTrash, Trash>()
             .register_required_components::<world::CrackedSideDoor1, CrackedDoor>()
-            .add_observer(loop0)
+            .add_observer(start)
             .add_observer(pills)
             .add_observer(trash);
     }
 }
 
-fn loop0(trigger: Trigger<OnAdd, Level>, levels: Query<&Level>, mut commands: Commands) {
+fn start(trigger: Trigger<OnAdd, Level>, levels: Query<&Level>, mut commands: Commands) {
     if !levels
         .get(trigger.target())
         .is_ok_and(|level| level.uid() == world::Level0.uid())

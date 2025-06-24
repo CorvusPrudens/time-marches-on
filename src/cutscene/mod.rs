@@ -8,8 +8,8 @@ use std::{any::TypeId, collections::VecDeque};
 
 use crate::textbox::{TextBlurb, TextboxCloseInteraction, TextboxEvent};
 
-mod fragments;
-mod movement;
+pub mod fragments;
+pub mod movement;
 
 pub struct CutscenePlugin;
 

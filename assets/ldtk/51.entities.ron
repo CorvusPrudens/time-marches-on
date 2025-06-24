@@ -1,20 +1,5 @@
 ([
     (
-        uid: (7),
-        instance: ("efa5e630-3740-11f0-80ab-d3d9640df89e"),
-        xyz: (200.0, -344.0, 5.0),
-        sprite: Some((
-            image: "ldtk/../textures/horror-house.png",
-            tileset: (1),
-            atlas: Rect((
-                min: (0.0, 16.0),
-                max: (16.0, 48.0),
-            )),
-            pivot: (0.5, 0.5),
-        )),
-        worldly: true,
-    ),
-    (
         uid: (61),
         instance: ("b7dc2bf0-3740-11f0-80ab-37f528ebba0e"),
         xyz: (288.0, -160.0, 5.0),
@@ -32,7 +17,7 @@
     (
         uid: (62),
         instance: ("143a9080-3740-11f0-80ab-d36c2bbc334e"),
-        xyz: (321.0, -117.0, 5.0),
+        xyz: (1041.0, -549.0, 5.0),
         sprite: Some((
             image: "ldtk/../textures/furniture.png",
             tileset: (59),
@@ -377,7 +362,7 @@
     (
         uid: (90),
         instance: ("2e12ffa0-3740-11f0-8402-6714053e042e"),
-        xyz: (1048.0, -549.0, 5.0),
+        xyz: (328.0, -117.0, 5.0),
         sprite: Some((
             image: "ldtk/../textures/furniture.png",
             tileset: (59),
@@ -534,7 +519,7 @@
     (
         uid: (62),
         instance: ("6fce6222-3740-11f0-8402-87d25693f368"),
-        xyz: (321.0, -805.0, 5.0),
+        xyz: (1041.0, -1237.0, 5.0),
         sprite: Some((
             image: "ldtk/../textures/furniture.png",
             tileset: (59),
@@ -879,7 +864,7 @@
     (
         uid: (90),
         instance: ("6fcf4c80-3740-11f0-8402-51d87ffdbac7"),
-        xyz: (1048.0, -1237.0, 5.0),
+        xyz: (328.0, -805.0, 5.0),
         sprite: Some((
             image: "ldtk/../textures/furniture.png",
             tileset: (59),
@@ -1017,5 +1002,20 @@
             pivot: (0.5, 0.5),
         )),
         worldly: false,
+    ),
+    (
+        uid: (7),
+        instance: ("26c147d0-3740-11f0-8f55-2fe6aea23b1e"),
+        xyz: (200.0, -344.0, 5.0),
+        sprite: Some((
+            image: "ldtk/../textures/horror-house.png",
+            tileset: (1),
+            atlas: Rect((
+                min: (0.0, 16.0),
+                max: (16.0, 48.0),
+            )),
+            pivot: (0.5, 0.5),
+        )),
+        worldly: true,
     ),
 ])

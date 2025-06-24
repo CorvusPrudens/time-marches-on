@@ -1,0 +1,504 @@
+([
+    (
+        uid: (61),
+        instance: ("3a41ea44-3740-11f0-8f55-c5669c33e4ed"),
+        xyz: (384.0, -160.0, 5.0),
+        sprite: Some((
+            image: "ldtk/../textures/furniture.png",
+            tileset: (59),
+            atlas: Rect((
+                min: (48.0, 304.0),
+                max: (80.0, 336.0),
+            )),
+            pivot: (0.5, 0.5),
+        )),
+        worldly: false,
+    ),
+    (
+        uid: (62),
+        instance: ("3a41ea45-3740-11f0-8f55-2186d19831d0"),
+        xyz: (1041.0, -549.0, 5.0),
+        sprite: Some((
+            image: "ldtk/../textures/furniture.png",
+            tileset: (59),
+            atlas: Rect((
+                min: (176.0, 336.0),
+                max: (192.0, 368.0),
+            )),
+            pivot: (0.5, 0.5),
+        )),
+        worldly: false,
+    ),
+    (
+        uid: (63),
+        instance: ("3a41ea46-3740-11f0-8f55-2be675b8cd8b"),
+        xyz: (272.0, -144.0, 5.0),
+        sprite: Some((
+            image: "ldtk/../textures/horror-house.png",
+            tileset: (1),
+            atlas: Rect((
+                min: (208.0, 48.0),
+                max: (256.0, 80.0),
+            )),
+            pivot: (0.0, 0.0),
+        )),
+        worldly: false,
+    ),
+    (
+        uid: (64),
+        instance: ("3a41ea47-3740-11f0-8f55-8db39afabe9e"),
+        xyz: (297.0, -128.0, 5.0),
+        sprite: Some((
+            image: "ldtk/../textures/furniture.png",
+            tileset: (59),
+            atlas: Rect((
+                min: (32.0, 208.0),
+                max: (48.0, 224.0),
+            )),
+            pivot: (0.0, 0.0),
+        )),
+        worldly: false,
+    ),
+    (
+        uid: (64),
+        instance: ("3a41ea48-3740-11f0-8f55-0b3cd759f1b2"),
+        xyz: (281.0, -128.0, 5.0),
+        sprite: Some((
+            image: "ldtk/../textures/furniture.png",
+            tileset: (59),
+            atlas: Rect((
+                min: (32.0, 208.0),
+                max: (48.0, 224.0),
+            )),
+            pivot: (0.0, 0.0),
+        )),
+        worldly: false,
+    ),
+    (
+        uid: (65),
+        instance: ("3a41ea49-3740-11f0-8f55-fbc7f723af0e"),
+        xyz: (282.0, -160.0, 5.0),
+        sprite: Some((
+            image: "ldtk/../textures/furniture.png",
+            tileset: (59),
+            atlas: Rect((
+                min: (16.0, 208.0),
+                max: (32.0, 224.0),
+            )),
+            pivot: (0.0, 0.0),
+        )),
+        worldly: false,
+    ),
+    (
+        uid: (65),
+        instance: ("3a41ea4a-3740-11f0-8f55-935fb5f8cdc3"),
+        xyz: (297.0, -160.0, 5.0),
+        sprite: Some((
+            image: "ldtk/../textures/furniture.png",
+            tileset: (59),
+            atlas: Rect((
+                min: (16.0, 208.0),
+                max: (32.0, 224.0),
+            )),
+            pivot: (0.0, 0.0),
+        )),
+        worldly: false,
+    ),
+    (
+        uid: (67),
+        instance: ("3a41ea4b-3740-11f0-8f55-1b66fe8ca0be"),
+        xyz: (400.0, -224.0, 5.0),
+        sprite: Some((
+            image: "ldtk/../textures/furniture.png",
+            tileset: (59),
+            atlas: Rect((
+                min: (160.0, 656.0),
+                max: (224.0, 688.0),
+            )),
+            pivot: (0.0, 0.0),
+        )),
+        worldly: false,
+    ),
+    (
+        uid: (69),
+        instance: ("3a41ea4c-3740-11f0-8f55-4d59905fdede"),
+        xyz: (389.0, -240.0, 5.0),
+        sprite: Some((
+            image: "ldtk/../textures/furniture.png",
+            tileset: (59),
+            atlas: Rect((
+                min: (16.0, 400.0),
+                max: (32.0, 432.0),
+            )),
+            pivot: (0.0, 0.0),
+        )),
+        worldly: false,
+    ),
+    (
+        uid: (70),
+        instance: ("3a41ea4d-3740-11f0-8f55-37e9ed3b59c1"),
+        xyz: (448.0, -320.0, 5.0),
+        sprite: Some((
+            image: "ldtk/../textures/furniture.png",
+            tileset: (59),
+            atlas: Rect((
+                min: (128.0, 64.0),
+                max: (160.0, 96.0),
+            )),
+            pivot: (0.0, 0.0),
+        )),
+        worldly: false,
+    ),
+    (
+        uid: (71),
+        instance: ("3a41ea4e-3740-11f0-8f55-1391660368bd"),
+        xyz: (448.0, -384.0, 5.0),
+        sprite: Some((
+            image: "ldtk/../textures/furniture.png",
+            tileset: (59),
+            atlas: Rect((
+                min: (48.0, 368.0),
+                max: (80.0, 384.0),
+            )),
+            pivot: (0.0, 0.0),
+        )),
+        worldly: false,
+    ),
+    (
+        uid: (68),
+        instance: ("3a41ea4f-3740-11f0-8f55-ebcbdaa90645"),
+        xyz: (494.0, -353.0, 5.0),
+        sprite: Some((
+            image: "ldtk/../textures/furniture.png",
+            tileset: (59),
+            atlas: Rect((
+                min: (112.0, 192.0),
+                max: (128.0, 224.0),
+            )),
+            pivot: (0.0, 0.0),
+        )),
+        worldly: false,
+    ),
+    (
+        uid: (73),
+        instance: ("3a41ea50-3740-11f0-8f55-b99b81c0349f"),
+        xyz: (208.0, -256.0, 5.0),
+        sprite: Some((
+            image: "ldtk/../textures/furniture.png",
+            tileset: (59),
+            atlas: Rect((
+                min: (160.0, 496.0),
+                max: (176.0, 528.0),
+            )),
+            pivot: (0.0, 0.0),
+        )),
+        worldly: false,
+    ),
+    (
+        uid: (74),
+        instance: ("3a41ea51-3740-11f0-8f55-81dcdf4b86fc"),
+        xyz: (184.0, -262.0, 5.0),
+        sprite: Some((
+            image: "ldtk/../textures/furniture.png",
+            tileset: (59),
+            atlas: Rect((
+                min: (176.0, 496.0),
+                max: (192.0, 528.0),
+            )),
+            pivot: (0.0, 0.0),
+        )),
+        worldly: false,
+    ),
+    (
+        uid: (75),
+        instance: ("3a41ea52-3740-11f0-8f55-f9c321e20d16"),
+        xyz: (160.0, -256.0, 5.0),
+        sprite: Some((
+            image: "ldtk/../textures/furniture.png",
+            tileset: (59),
+            atlas: Rect((
+                min: (192.0, 496.0),
+                max: (208.0, 528.0),
+            )),
+            pivot: (0.0, 0.0),
+        )),
+        worldly: false,
+    ),
+    (
+        uid: (76),
+        instance: ("3a41ea53-3740-11f0-8f55-f5be22813274"),
+        xyz: (144.0, -352.0, 5.0),
+        sprite: Some((
+            image: "ldtk/../textures/furniture.png",
+            tileset: (59),
+            atlas: Rect((
+                min: (208.0, 720.0),
+                max: (224.0, 736.0),
+            )),
+            pivot: (0.0, 0.0),
+        )),
+        worldly: false,
+    ),
+    (
+        uid: (77),
+        instance: ("3a41ea54-3740-11f0-8f55-6de5674d0a84"),
+        xyz: (146.0, -337.0, 5.0),
+        sprite: Some((
+            image: "ldtk/../textures/furniture.png",
+            tileset: (59),
+            atlas: Rect((
+                min: (16.0, 608.0),
+                max: (32.0, 624.0),
+            )),
+            pivot: (0.0, 0.0),
+        )),
+        worldly: false,
+    ),
+    (
+        uid: (78),
+        instance: ("3a41ea55-3740-11f0-8f55-61293f34d0bf"),
+        xyz: (187.0, -301.0, 5.0),
+        sprite: Some((
+            image: "ldtk/../textures/furniture.png",
+            tileset: (59),
+            atlas: Rect((
+                min: (112.0, 272.0),
+                max: (128.0, 288.0),
+            )),
+            pivot: (0.0, 0.0),
+        )),
+        worldly: false,
+    ),
+    (
+        uid: (83),
+        instance: ("3a41ea56-3740-11f0-8f55-df125bbb0712"),
+        xyz: (518.0, -218.0, 5.0),
+        sprite: Some((
+            image: "ldtk/../textures/furniture.png",
+            tileset: (59),
+            atlas: Rect((
+                min: (144.0, 768.0),
+                max: (160.0, 800.0),
+            )),
+            pivot: (0.5, 0.5),
+        )),
+        worldly: false,
+    ),
+    (
+        uid: (84),
+        instance: ("3a41ea57-3740-11f0-8f55-6f319be5fd75"),
+        xyz: (186.0, -466.0, 5.0),
+        sprite: Some((
+            image: "ldtk/../textures/furniture.png",
+            tileset: (59),
+            atlas: Rect((
+                min: (160.0, 768.0),
+                max: (176.0, 800.0),
+            )),
+            pivot: (0.5, 0.5),
+        )),
+        worldly: false,
+    ),
+    (
+        uid: (84),
+        instance: ("3a41ea58-3740-11f0-8f55-fb2b013f917f"),
+        xyz: (761.0, -591.0, 5.0),
+        sprite: Some((
+            image: "ldtk/../textures/furniture.png",
+            tileset: (59),
+            atlas: Rect((
+                min: (160.0, 768.0),
+                max: (176.0, 800.0),
+            )),
+            pivot: (0.5, 0.5),
+        )),
+        worldly: false,
+    ),
+    (
+        uid: (83),
+        instance: ("3a41ea59-3740-11f0-8f55-3db24e32b69b"),
+        xyz: (1127.0, -591.0, 5.0),
+        sprite: Some((
+            image: "ldtk/../textures/furniture.png",
+            tileset: (59),
+            atlas: Rect((
+                min: (144.0, 768.0),
+                max: (160.0, 800.0),
+            )),
+            pivot: (0.5, 0.5),
+        )),
+        worldly: false,
+    ),
+    (
+        uid: (88),
+        instance: ("3a41ea5a-3740-11f0-8f55-993d8e602907"),
+        xyz: (312.0, -437.0, 5.0),
+        sprite: Some((
+            image: "ldtk/../textures/furniture.png",
+            tileset: (59),
+            atlas: Rect((
+                min: (176.0, 336.0),
+                max: (192.0, 368.0),
+            )),
+            pivot: (0.5, 0.5),
+        )),
+        worldly: false,
+    ),
+    (
+        uid: (89),
+        instance: ("3a41ea5b-3740-11f0-8f55-0f3b4b13df8d"),
+        xyz: (840.0, -549.0, 5.0),
+        sprite: Some((
+            image: "ldtk/../textures/furniture.png",
+            tileset: (59),
+            atlas: Rect((
+                min: (176.0, 336.0),
+                max: (192.0, 368.0),
+            )),
+            pivot: (0.5, 0.5),
+        )),
+        worldly: false,
+    ),
+    (
+        uid: (90),
+        instance: ("3a41ea5c-3740-11f0-8f55-87b29a16628c"),
+        xyz: (328.0, -117.0, 5.0),
+        sprite: Some((
+            image: "ldtk/../textures/furniture.png",
+            tileset: (59),
+            atlas: Rect((
+                min: (176.0, 336.0),
+                max: (192.0, 368.0),
+            )),
+            pivot: (0.5, 0.5),
+        )),
+        worldly: false,
+    ),
+    (
+        uid: (91),
+        instance: ("3a41ea5d-3740-11f0-8f55-91260a03b04b"),
+        xyz: (802.0, -106.0, 5.0),
+        sprite: Some((
+            image: "ldtk/../textures/furniture.png",
+            tileset: (59),
+            atlas: Rect((
+                min: (128.0, 688.0),
+                max: (144.0, 720.0),
+            )),
+            pivot: (0.0, 0.0),
+        )),
+        worldly: false,
+    ),
+    (
+        uid: (92),
+        instance: ("3a41ea5e-3740-11f0-8f55-2344b1e1d996"),
+        xyz: (784.0, -112.0, 5.0),
+        sprite: Some((
+            image: "ldtk/../textures/furniture.png",
+            tileset: (59),
+            atlas: Rect((
+                min: (80.0, 704.0),
+                max: (96.0, 720.0),
+            )),
+            pivot: (0.0, 0.0),
+        )),
+        worldly: false,
+    ),
+    (
+        uid: (93),
+        instance: ("3a421150-3740-11f0-8f55-a5f075be699f"),
+        xyz: (784.0, -96.0, 5.0),
+        sprite: Some((
+            image: "ldtk/../textures/furniture.png",
+            tileset: (59),
+            atlas: Rect((
+                min: (32.0, 112.0),
+                max: (48.0, 128.0),
+            )),
+            pivot: (0.0, 0.0),
+        )),
+        worldly: false,
+    ),
+    (
+        uid: (94),
+        instance: ("3a421151-3740-11f0-8f55-934e1a4fa4a5"),
+        xyz: (816.0, -96.0, 5.0),
+        sprite: Some((
+            image: "ldtk/../textures/furniture.png",
+            tileset: (59),
+            atlas: Rect((
+                min: (224.0, 656.0),
+                max: (240.0, 688.0),
+            )),
+            pivot: (0.0, 0.0),
+        )),
+        worldly: false,
+    ),
+    (
+        uid: (95),
+        instance: ("3a421152-3740-11f0-8f55-793e59c8881d"),
+        xyz: (398.0, -281.0, 5.0),
+        sprite: Some((
+            image: "ldtk/../textures/furniture.png",
+            tileset: (59),
+            atlas: Rect((
+                min: (128.0, 672.0),
+                max: (144.0, 688.0),
+            )),
+            pivot: (0.5, 0.5),
+        )),
+        worldly: false,
+    ),
+    (
+        uid: (96),
+        instance: ("3a421153-3740-11f0-8f55-6de52b6b51be"),
+        xyz: (808.0, -178.0, 5.0),
+        sprite: Some((
+            image: "ldtk/../textures/furniture.png",
+            tileset: (59),
+            atlas: Rect((
+                min: (176.0, 768.0),
+                max: (192.0, 784.0),
+            )),
+            pivot: (0.5, 0.5),
+        )),
+        worldly: false,
+    ),
+    (
+        uid: (102),
+        instance: ("3a421155-3740-11f0-8f55-e15d583bce40"),
+        xyz: (395.0, -282.0, 5.0),
+        sprite: None,
+        worldly: false,
+    ),
+    (
+        uid: (105),
+        instance: ("3a421156-3740-11f0-8f55-25a528f1f0f1"),
+        xyz: (518.0, -218.0, 5.0),
+        sprite: Some((
+            image: "ldtk/../textures/furniture.png",
+            tileset: (59),
+            atlas: Rect((
+                min: (192.0, 768.0),
+                max: (208.0, 800.0),
+            )),
+            pivot: (0.5, 0.5),
+        )),
+        worldly: false,
+    ),
+    (
+        uid: (7),
+        instance: ("230689c0-3740-11f0-8f55-8d55cc3018f4"),
+        xyz: (328.0, -200.0, 5.0),
+        sprite: Some((
+            image: "ldtk/../textures/horror-house.png",
+            tileset: (1),
+            atlas: Rect((
+                min: (0.0, 16.0),
+                max: (16.0, 48.0),
+            )),
+            pivot: (0.5, 0.5),
+        )),
+        worldly: true,
+    ),
+])

@@ -23,20 +23,21 @@ use crate::textbox::{TextBlurb, TextboxEvent};
 use crate::{GameState, HexColor, Layer, TILE_SIZE, world};
 
 mod pills;
+mod visitor;
 
 pub struct LevelPlugin;
 
 impl Plugin for LevelPlugin {
     fn build(&self, app: &mut App) {
-        app.add_plugins(pills::PillsPlugin)
+        app.add_plugins((pills::PillsPlugin, visitor::VisitorPlugin))
             .register_required_components::<world::Teleport, Teleporter>()
-            .register_required_components::<world::LunaDoor, Door>()
-            .register_required_components::<world::HallDoor1, Door>()
-            .register_required_components::<world::HallDoor2, Door>()
+            .register_required_components::<world::LunaDoor, VerticalDoor>()
+            .register_required_components::<world::HallDoor1, VerticalDoor>()
+            .register_required_components::<world::FrontDoor, VerticalDoor>()
             .register_required_components::<world::SideDoor1, Door>()
             .register_required_components::<world::SideDoor2, Door>()
-            .register_required_components::<world::BathroomDoor, Door>()
-            .register_required_components::<world::BathroomExitDoor, Door>()
+            .register_required_components::<world::BathroomDoor, VerticalDoor>()
+            .register_required_components::<world::BathroomExitDoor, VerticalDoor>()
             .register_required_components::<world::CrackedSideDoor1, Door>()
             .add_systems(Update, (add_tile_collision, manage_transitions))
             .add_systems(OnEnter(GameState::Playing), load_ldtk)
@@ -184,6 +185,15 @@ fn manage_transitions(
 
 #[derive(Default, Component)]
 #[require(
+    Collider::rectangle(16., 24.),
+    Sensor,
+    CollidingEntities,
+    CollisionLayers::new(Layer::Default, Layer::Player)
+)]
+struct VerticalDoor;
+
+#[derive(Default, Component)]
+#[require(
     Collider::rectangle(24., 24.),
     Sensor,
     CollidingEntities,
@@ -196,7 +206,7 @@ fn door(
 
     luna_door: Query<(&world::LunaDoor, &CollidingEntities, &ChildOf)>,
     hall_doors1: Query<(&world::HallDoor1, &CollidingEntities, &ChildOf)>,
-    hall_doors2: Query<(&world::HallDoor2, &CollidingEntities, &ChildOf)>,
+    hall_doors2: Query<(&world::FrontDoor, &CollidingEntities, &ChildOf)>,
     side_doors1: Query<(&world::SideDoor1, &CollidingEntities, &ChildOf)>,
     side_doors2: Query<(&world::SideDoor2, &CollidingEntities, &ChildOf)>,
     bathroom_door1: Query<(&world::BathroomDoor, &CollidingEntities, &ChildOf)>,
@@ -303,7 +313,8 @@ fn load_ldtk(
     commands.spawn((
         bevy_ldtk_scene::HotWorld(server.load("ldtk/time-marches-on.ldtk")),
         bevy_ldtk_scene::World(server.load("ldtk/time-marches-on.ron")),
-        bevy_ldtk_scene::prelude::LevelLoader::levels(world::Level0),
+        //bevy_ldtk_scene::prelude::LevelLoader::levels(world::Level0),
+        bevy_ldtk_scene::prelude::LevelLoader::levels(world::Level1),
     ));
 }
 
