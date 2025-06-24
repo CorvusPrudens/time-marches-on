@@ -19,6 +19,7 @@ mod animation;
 mod audio;
 mod callback;
 mod cutscene;
+mod cutscenes;
 mod entities;
 mod fragments;
 mod hook;
@@ -101,6 +102,7 @@ fn main() {
         animation::AnimationPlugin,
         hook::HookPlugin,
         cutscene::CutscenePlugin,
+        cutscenes::CutscenePlugin,
         notes::NotesPlugin,
         audio::AudioPlugin,
     ))

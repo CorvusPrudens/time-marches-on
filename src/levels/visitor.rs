@@ -127,9 +127,11 @@ fn visitor(mut commands: Commands, mut reader: EventReader<VisitorEvent>) {
 }
 
 fn friendly_neighbor(commands: &mut Commands) {
-    neighbor()
+    crate::cutscenes::visitor::visitor()
         .on_end(
-            |mut commands: Commands, door: Single<Entity, With<TheDoor>>| {
+            |mut commands: Commands,
+             door: Single<Entity, With<TheDoor>>,
+             server: Res<AssetServer>| {
                 commands.entity(*door).insert((
                     DoorState::Closed,
                     crate::world::Interaction {
@@ -138,11 +140,9 @@ fn friendly_neighbor(commands: &mut Commands) {
                         flavor: String::from("He is still outside..."),
                     },
                 ));
+
+                commands.spawn(SamplePlayer::new(server.load("audio/sfx/door-close.wav")));
             },
         )
         .spawn_box(commands);
-}
-
-fn neighbor() -> impl IntoBox {
-    ("Hello, world!", "How are you?").always().once()
 }

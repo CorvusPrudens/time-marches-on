@@ -30,10 +30,14 @@ impl Plugin for TextboxPlugin {
             )
             .init_resource::<TextboxSections>()
             .add_event::<TextboxEvent>()
+            .add_event::<CharacterEvent>()
             .add_event::<TextboxCloseInteraction>()
             .add_event::<TextboxCloseEvent>()
             .init_resource::<GlyphReveal>()
-            .add_systems(Update, (textbox_event, close_textbox))
+            .add_systems(
+                Update,
+                ((textbox_event, handle_sprite_event).chain(), close_textbox),
+            )
             .add_observer(bind)
             .add_observer(textbox_input)
             .add_observer(reveal_textbox);
@@ -73,6 +77,13 @@ impl TextboxEvent {
             despawn_when_finished: false,
         }
     }
+}
+
+/// Sets the dialog sprite.
+#[derive(Event)]
+pub struct CharacterEvent {
+    pub sprite: Option<CharacterSprite>,
+    pub glyph: Arc<dyn Fn(&mut Commands, &AssetServer) + Send + Sync>,
 }
 
 #[derive(Clone)]
@@ -219,7 +230,7 @@ fn textbox_input(
     }
 }
 
-#[derive(Event)]
+#[derive(Event, Default)]
 pub struct TextboxCloseEvent;
 
 fn close_textbox(
@@ -292,6 +303,36 @@ pub fn spawn_textbox(server: Res<AssetServer>, mut commands: Commands) {
         .id();
 
     commands.entity(textbox).add_child(text);
+}
+
+fn handle_sprite_event(
+    textbox: Single<Entity, With<Textbox>>,
+    old_character: Option<Single<Entity, With<CharacterSpriteEntity>>>,
+    mut events: EventReader<CharacterEvent>,
+    mut commands: Commands,
+    mut reveal: ResMut<GlyphReveal>,
+    server: Res<AssetServer>,
+) {
+    if !events.is_empty() {
+        if let Some(old_character) = old_character {
+            commands.entity(*old_character).despawn();
+        }
+    }
+
+    let Some(next_event) = events.read().next() else {
+        return;
+    };
+
+    if let Some(character) = &next_event.sprite {
+        commands.entity(*textbox).with_child((
+            CharacterSpriteEntity,
+            Sprite::from_image(server.load(&character.0)),
+            Transform::from_xyz(0., 0., -3.).with_scale(Vec3::splat(crate::RESOLUTION_SCALE)),
+            HIGH_RES_LAYER,
+        ));
+    }
+
+    reveal.0 = Some(next_event.glyph.clone());
 }
 
 fn pop_next_section(

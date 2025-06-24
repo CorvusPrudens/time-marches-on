@@ -6,8 +6,9 @@ use bevy_sequence::{
 use fragments::IntoBox;
 use std::{any::TypeId, collections::VecDeque};
 
-use crate::textbox::{TextBlurb, TextboxCloseInteraction, TextboxEvent};
+use crate::textbox::{TextBlurb, TextboxCloseEvent, TextboxCloseInteraction, TextboxEvent};
 
+pub mod chara;
 pub mod fragments;
 pub mod movement;
 
@@ -20,7 +21,7 @@ impl Plugin for CutscenePlugin {
 
         app.init_resource::<FragmentEndEvents>()
             .insert_resource(cache)
-            .add_event::<FragmentEvent<fragments::SectionFrag>>()
+            .add_event::<FragmentEvent<fragments::CutsceneFragment>>()
             .add_systems(
                 PostUpdate,
                 movement::apply_movements::<EasingCurve<Vec3>>
@@ -32,7 +33,7 @@ impl Plugin for CutscenePlugin {
             )
             .add_systems(
                 PostUpdate,
-                fragment_bridge_end.before(bevy_sequence::SequenceSets::Respond),
+                (fragment_bridge_end, tick_delay).before(bevy_sequence::SequenceSets::Respond),
             );
     }
 }
@@ -50,17 +51,37 @@ impl IntoCurve<EasingCurve<Vec3>> for EaseFunction {
 #[derive(Resource, Default)]
 struct FragmentEndEvents(VecDeque<FragmentEndEvent>);
 
+#[derive(Component)]
+struct Delay {
+    timer: Timer,
+    id: FragmentEndEvent,
+}
+
 fn fragment_bridge_start(
-    mut fragment_events: EventReader<FragmentEvent<fragments::SectionFrag>>,
+    mut fragment_events: EventReader<FragmentEvent<fragments::CutsceneFragment>>,
     mut textbox: EventWriter<TextboxEvent>,
 
+    mut close: EventWriter<TextboxCloseEvent>,
+
     mut ids: ResMut<FragmentEndEvents>,
+    mut commands: Commands,
 ) {
     for event in fragment_events.read() {
-        ids.0.push_back(event.end());
-        textbox.write(TextboxEvent::section_retained(TextBlurb::main_character(
-            event.data.section.clone(),
-        )));
+        match &event.data {
+            fragments::CutsceneFragment::Dialog(d) => {
+                ids.0.push_back(event.end());
+                textbox.write(TextboxEvent::section_retained(TextBlurb::main_character(
+                    d.clone(),
+                )));
+            }
+            fragments::CutsceneFragment::Pause(p) => {
+                commands.spawn(Delay {
+                    timer: Timer::new(*p, TimerMode::Once),
+                    id: event.end(),
+                });
+                close.write_default();
+            }
+        }
     }
 }
 
@@ -73,6 +94,23 @@ fn fragment_bridge_end(
     for _event in text_end.read() {
         if let Some(end) = ids.0.pop_front() {
             fragment_end.write(end);
+        }
+    }
+}
+
+fn tick_delay(
+    mut delays: Query<(Entity, &mut Delay)>,
+    mut commands: Commands,
+    time: Res<Time>,
+
+    mut fragment_end: EventWriter<FragmentEndEvent>,
+) {
+    let delta = time.delta();
+
+    for (entity, mut delay) in delays.iter_mut() {
+        if delay.timer.tick(delta).just_finished() {
+            commands.entity(entity).despawn();
+            fragment_end.write(delay.id);
         }
     }
 }

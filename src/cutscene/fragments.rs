@@ -1,16 +1,16 @@
 use bevy::prelude::*;
 use bevy_sequence::{fragment::DataLeaf, prelude::*};
-use std::marker::PhantomData;
+use std::{marker::PhantomData, time::Duration};
 
 use crate::textbox::TextboxCloseEvent;
 
-pub trait IntoBox<C = EmptyCutscene>: IntoFragment<SectionFrag, TextBoxContext<C>> {
+pub trait IntoBox<C = EmptyCutscene>: IntoFragment<CutsceneFragment, TextBoxContext<C>> {
     fn spawn_box(self, commands: &mut Commands);
 }
 
 impl<C, T> IntoBox<C> for T
 where
-    T: IntoFragment<SectionFrag, TextBoxContext<C>>,
+    T: IntoFragment<CutsceneFragment, TextBoxContext<C>>,
     C: 'static,
 {
     fn spawn_box(self, commands: &mut Commands) {
@@ -43,21 +43,46 @@ impl<C> TextBoxContext<C> {
 }
 
 #[derive(Debug, Clone)]
-pub struct SectionFrag {
-    pub section: String,
+pub enum CutsceneFragment {
+    Dialog(String),
+    Pause(Duration),
+}
+
+impl From<u64> for CutsceneFragment {
+    fn from(value: u64) -> Self {
+        Self::Pause(Duration::from_millis(value))
+    }
+}
+
+impl From<Duration> for CutsceneFragment {
+    fn from(value: Duration) -> Self {
+        Self::Pause(value)
+    }
+}
+
+impl From<String> for CutsceneFragment {
+    fn from(value: String) -> Self {
+        Self::Dialog(value)
+    }
+}
+
+impl<'a> From<&'a str> for CutsceneFragment {
+    fn from(value: &'a str) -> Self {
+        Self::Dialog(value.into())
+    }
 }
 
 macro_rules! impl_into_frag {
     ($ty:ty, $x:ident, $into:expr) => {
-        impl<C> IntoFragment<SectionFrag, TextBoxContext<C>> for $ty {
+        impl<C> IntoFragment<CutsceneFragment, TextBoxContext<C>> for $ty {
             fn into_fragment(
                 self,
                 context: &Context<TextBoxContext<C>>,
                 commands: &mut Commands,
             ) -> FragmentId {
                 let $x = self;
-                <_ as IntoFragment<SectionFrag, TextBoxContext<C>>>::into_fragment(
-                    DataLeaf::new(SectionFrag { section: $into }),
+                <_ as IntoFragment<CutsceneFragment, TextBoxContext<C>>>::into_fragment(
+                    DataLeaf::new($into),
                     context,
                     commands,
                 )
@@ -66,5 +91,7 @@ macro_rules! impl_into_frag {
     };
 }
 
-impl_into_frag!(&'static str, slf, slf.into());
-impl_into_frag!(String, slf, slf.into());
+impl_into_frag!(&'static str, slf, slf);
+impl_into_frag!(String, slf, slf);
+impl_into_frag!(Duration, slf, slf);
+impl_into_frag!(u64, slf, slf);
