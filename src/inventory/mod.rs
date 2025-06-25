@@ -9,7 +9,7 @@ use bevy::{
 };
 use bevy_enhanced_input::prelude::{Actions, InputContextAppExt};
 
-use crate::player::{Player, PlayerContext};
+use crate::player::{InhibitRemoveEvent, Player, PlayerContext};
 
 mod input;
 pub mod item;
@@ -108,9 +108,7 @@ fn teardown_ui(
     mut directional_nav_map: ResMut<DirectionalNavigationMap>,
 ) {
     directional_nav_map.clear();
-    commands
-        .entity(*player)
-        .insert(Actions::<PlayerContext>::default());
+    commands.entity(*player).trigger(InhibitRemoveEvent);
     commands.entity(*inventory).despawn();
 }
 

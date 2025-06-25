@@ -6,7 +6,6 @@ use bevy::ecs::world::DeferredWorld;
 use bevy::platform::collections::HashMap;
 use bevy::prelude::*;
 use bevy_enhanced_input::events::Fired;
-use bevy_enhanced_input::prelude::Actions;
 use bevy_ldtk_scene::levels::{Level, LevelLoader};
 use bevy_ldtk_scene::world::LevelUid;
 use bevy_optix::camera::MainCamera;
@@ -21,7 +20,7 @@ use bevy_tween::tween::IntoTarget;
 
 use crate::callback::Callback;
 use crate::interactions::{InteractAction, Interactable};
-use crate::player::{Player, PlayerCollider, PlayerContext};
+use crate::player::{InhibitAddEvent, InhibitRemoveEvent, Player, PlayerCollider};
 use crate::textbox::{TextBlurb, TextboxEvent};
 use crate::{GameState, HexColor, Layer, TILE_SIZE, world};
 
@@ -361,7 +360,7 @@ fn door(
             Some(target) => {
                 let level_t = transforms.get(child_of.parent())?.translation();
 
-                commands.entity(player.0).remove::<Actions<PlayerContext>>();
+                commands.entity(player.0).trigger(InhibitAddEvent);
                 commands.spawn(
                     SamplePlayer::new(server.load("audio/sfx/door.wav"))
                         .with_volume(Volume::Decibels(-12.0)),
@@ -374,9 +373,7 @@ fn door(
                         player.translation.y = -target.y * 16. + level_t.y;
                     },
                     |player: Single<Entity, With<Player>>, mut commands: Commands| {
-                        commands
-                            .entity(*player)
-                            .insert(Actions::<PlayerContext>::default());
+                        commands.entity(*player).trigger(InhibitRemoveEvent);
                     },
                 ));
             }

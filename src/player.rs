@@ -1,3 +1,4 @@
+use std::marker::PhantomData;
 use std::time::Duration;
 
 use avian2d::prelude::*;
@@ -30,7 +31,64 @@ impl Plugin for PlayerPlugin {
             .add_observer(apply_movement)
             .add_observer(stop_movement)
             .add_observer(move_sprite)
-            .add_observer(stop_sprite);
+            .add_observer(stop_sprite)
+            .add_observer(observe_add_inhibit::<PlayerContext>)
+            .add_observer(observe_remove_inhibit::<PlayerContext>);
+    }
+}
+
+#[derive(Event)]
+pub struct InhibitAddEvent;
+
+#[derive(Event)]
+pub struct InhibitRemoveEvent;
+
+#[derive(Component)]
+pub struct ControlInhibitor<C: InputContext> {
+    inhibit_count: usize,
+    context: PhantomData<fn() -> C>,
+}
+
+fn observe_add_inhibit<C: InputContext>(
+    trigger: Trigger<InhibitAddEvent>,
+    inhibited: Query<Has<ControlInhibitor<C>>>,
+    mut commands: Commands,
+) -> Result {
+    if !inhibited.get(trigger.target())? {
+        commands.entity(trigger.target()).remove::<Actions<C>>();
+    }
+
+    commands
+        .entity(trigger.target())
+        .entry::<ControlInhibitor<C>>()
+        .or_insert(ControlInhibitor {
+            inhibit_count: 0,
+            context: PhantomData,
+        })
+        .and_modify(|mut c| c.inhibit_count += 1);
+
+    Ok(())
+}
+
+fn observe_remove_inhibit<C: InputContext>(
+    trigger: Trigger<InhibitRemoveEvent>,
+    mut inhibited: Query<&mut ControlInhibitor<C>>,
+    mut commands: Commands,
+) {
+    let Ok(mut inhibit) = inhibited.get_mut(trigger.target()) else {
+        commands
+            .entity(trigger.target())
+            .insert(Actions::<C>::default());
+        return;
+    };
+
+    inhibit.inhibit_count = inhibit.inhibit_count.saturating_sub(1);
+
+    if inhibit.inhibit_count == 0 {
+        commands
+            .entity(trigger.target())
+            .remove::<ControlInhibitor<C>>()
+            .insert(Actions::<C>::default());
     }
 }
 

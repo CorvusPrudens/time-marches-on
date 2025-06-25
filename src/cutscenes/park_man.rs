@@ -6,12 +6,7 @@ use bevy_sequence::prelude::*;
 pub struct ParkCutscene;
 
 pub fn park() -> impl IntoBox<ParkCutscene> {
-    (
-        "You see a woman in the distance.",
-        1.0,
-        "Luna!".father(),
-        "Honey, hold up just a moment!".father(),
-    )
+    ("Luna!".father(), "Honey, hold up just a moment!".father())
         .always()
         .once()
 }

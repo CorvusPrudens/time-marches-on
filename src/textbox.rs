@@ -11,7 +11,7 @@ use bevy_seedling::prelude::Volume;
 use bevy_seedling::sample::{PitchRange, SamplePlayer};
 
 use crate::animation::{AnimationAppExt, AnimationSprite};
-use crate::player::{Player, PlayerContext};
+use crate::player::{InhibitAddEvent, InhibitRemoveEvent, Player, PlayerContext};
 
 pub struct TextboxPlugin;
 
@@ -165,8 +165,8 @@ fn textbox_event(
         sections.sections.extend(event.blurbs.iter().cloned().rev());
         sections.despawn_when_finished = event.despawn_when_finished;
 
-        commands.entity(*player).remove::<Actions<PlayerContext>>();
         if textbox.is_none() {
+            commands.entity(*player).trigger(InhibitAddEvent);
             commands.run_system_cached(spawn_textbox);
         }
         commands.run_system_cached(pop_next_section);
@@ -241,9 +241,7 @@ fn close_textbox(
 ) {
     for _ in reader.read() {
         commands.entity(*textbox).despawn();
-        commands
-            .entity(*player)
-            .insert(Actions::<PlayerContext>::default());
+        commands.entity(*player).trigger(InhibitRemoveEvent);
     }
 }
 

@@ -2,7 +2,10 @@ use bevy::prelude::*;
 use bevy_sequence::{fragment::DataLeaf, prelude::*};
 use std::{marker::PhantomData, time::Duration};
 
-use crate::textbox::TextboxCloseEvent;
+use crate::{
+    player::{InhibitAddEvent, InhibitRemoveEvent},
+    textbox::TextboxCloseEvent,
+};
 
 pub trait IntoBox<C = EmptyCutscene>: IntoFragment<CutsceneFragment, TextBoxContext<C>> {
     fn spawn_box(self, commands: &mut Commands);
@@ -15,9 +18,22 @@ where
 {
     fn spawn_box(self, commands: &mut Commands) {
         spawn_root_with(
-            self.on_end(|mut writer: EventWriter<TextboxCloseEvent>| {
-                writer.write(TextboxCloseEvent);
-            }),
+            self.on_start(
+                |player: Single<Entity, With<crate::player::Player>>, mut commands: Commands| {
+                    commands.entity(*player).trigger(InhibitAddEvent);
+                },
+            )
+            .on_end(
+                |mut writer: EventWriter<TextboxCloseEvent>,
+                 player: Option<Single<Entity, With<crate::player::Player>>>,
+                 mut commands: Commands| {
+                    writer.write(TextboxCloseEvent);
+
+                    if let Some(player) = player {
+                        commands.entity(*player).trigger(InhibitRemoveEvent);
+                    }
+                },
+            ),
             commands,
             TextBoxContext::new(),
         );

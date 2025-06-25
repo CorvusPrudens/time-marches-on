@@ -53,7 +53,6 @@ pub enum TeaState {
 
 fn ready_trigger(spawner: Query<Entity, With<TeaSpawner>>, mut commands: Commands) {
     for spawner in spawner.iter() {
-        info!("removed collider!");
         commands.entity(spawner).remove::<ColliderDisabled>();
     }
 }

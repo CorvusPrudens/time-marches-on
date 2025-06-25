@@ -71,7 +71,6 @@ pub fn sample_speed(start: f32, end: f32) -> InterpolateSampleSpeed {
 pub fn sample_speed_to(to: f32) -> impl Fn(&mut f32) -> InterpolateSampleSpeed {
     move |state: &mut f32| {
         let start = *state;
-        bevy::prelude::info!("we ran?");
 
         let end = to;
         *state = to;

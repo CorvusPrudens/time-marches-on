@@ -10,7 +10,7 @@ use bevy_tween::interpolate::{sprite_color, translation};
 use bevy_tween::prelude::{AnimationBuilderExt, EaseKind};
 use bevy_tween::tween::IntoTarget;
 
-use crate::player::{self, Player, PlayerContext};
+use crate::player::{self, InhibitAddEvent, Player, PlayerContext};
 use crate::textbox::{Interact, TextboxContext};
 
 pub struct NotesPlugin;
@@ -54,7 +54,7 @@ fn note_event(
     reader.clear();
 
     commands.spawn(Entered);
-    commands.entity(*player).remove::<Actions<PlayerContext>>();
+    commands.entity(*player).trigger(InhibitAddEvent);
 
     let entity = commands.spawn_empty().id();
     commands

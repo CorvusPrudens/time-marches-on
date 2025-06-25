@@ -1,7 +1,10 @@
 use bevy::prelude::*;
 use bevy_enhanced_input::prelude::*;
 
-use crate::{PlayingState, player::PlayerContext};
+use crate::{
+    PlayingState,
+    player::{InhibitAddEvent, PlayerContext},
+};
 
 #[derive(Debug, InputAction)]
 #[input_action(output = bool, require_reset = true)]
@@ -33,9 +36,7 @@ pub fn pause(
     mut next_state: ResMut<NextState<PlayingState>>,
 ) -> Result {
     // remove player context, enter paused state
-    commands
-        .entity(trigger.target())
-        .remove::<Actions<PlayerContext>>();
+    commands.entity(trigger.target()).trigger(InhibitAddEvent);
     next_state.set(PlayingState::Paused);
 
     Ok(())

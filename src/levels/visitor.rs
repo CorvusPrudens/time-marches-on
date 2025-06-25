@@ -132,10 +132,21 @@ fn luna_run(
     mut commands: Commands,
     luna: Single<(Entity, &GlobalTransform), With<LunaRun>>,
     player: Single<&Transform, With<Player>>,
+
+    server: Res<AssetServer>,
 ) {
     let (entity, gt) = luna.into_inner();
 
     if gt.translation().xy().distance(player.translation.xy()) < 80. {
+        commands.spawn((
+            SamplePlayer::new(server.load("audio/music/lonely-night.ogg"))
+                .looping()
+                .with_volume(Volume::Decibels(-6.0)),
+            crate::audio::MusicPool,
+        ));
+
+        crate::cutscenes::park_man::park().spawn_box(&mut commands);
+
         commands
             .entity(entity)
             .insert((
@@ -204,10 +215,6 @@ fn tree_man_scene(commands: &mut Commands) {
             );
         })
         .spawn_box(commands);
-}
-
-fn tree_man() -> impl IntoBox {
-    ("Hello, world!", "How are you?").always().once()
 }
 
 #[derive(Component)]
