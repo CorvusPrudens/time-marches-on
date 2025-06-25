@@ -49,7 +49,6 @@ fn main() {
                 primary_window: Some(Window {
                     // TODO: Rename
                     title: "Time Marches On".to_string(),
-                    canvas: Some("#bevy".to_owned()),
                     fit_canvas_to_parent: true,
                     prevent_default_event_handling: false,
                     resolution: WindowResolution::new(
@@ -70,7 +69,6 @@ fn main() {
                 ..Default::default()
             }),
         bevy_tween::DefaultTweenPlugins,
-        bevy_seedling::SeedlingPlugin::default(),
         bevy_enhanced_input::EnhancedInputPlugin,
         avian2d::PhysicsPlugins::new(Avian).with_length_unit(8.),
         bevy_optix::pixel_perfect::PixelPerfectPlugin(CanvasDimensions {
@@ -112,6 +110,19 @@ fn main() {
     .init_schedule(Avian)
     .insert_resource(Gravity(Vec2::ZERO))
     .add_systems(Startup, set_window_icon);
+
+    #[cfg(not(feature = "web-audio"))]
+    app.add_plugins(bevy_seedling::SeedlingPlugin::default());
+
+    #[cfg(feature = "web-audio")]
+    app.add_plugins(
+        bevy_seedling::SeedlingPlugin::<firewheel_web_audio::WebAudioBackend> {
+            config: Default::default(),
+            stream_config: Default::default(),
+            spawn_default_pool: true,
+            pool_size: 4..=32,
+        },
+    );
 
     app.world_mut()
         .resource_mut::<FixedMainScheduleOrder>()
