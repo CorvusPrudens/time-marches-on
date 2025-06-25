@@ -38,7 +38,7 @@ lto = true
 
 [features]
 default = ["dev"]
-dev = ["bevy/dynamic_linking", "bevy/file_watcher"]
+dev = ["bevy/dynamic_linking", "bevy/file_watcher", "bevy/track_location"]
 web-audio = ["dep:firewheel-web-audio"]
 
 [dependencies]

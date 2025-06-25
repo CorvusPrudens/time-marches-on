@@ -189,6 +189,7 @@ jobs:
         if: ${{ matrix.platform == 'web' }}
         run: |
           printf '[toolchain]\nchannel = "nightly-2025-06-01"' > rust-toolchain.toml
+          mv .wasm-cargo .cargo
 
       - name: Restore Rust cache
         if: ${{ env.is_platform_enabled == 'true' && env.use_github_cache == 'true' }}
@@ -215,19 +216,17 @@ jobs:
 
       - name: Build and add web bundle to app (Web)
         if: ${{ env.is_platform_enabled == 'true' && matrix.platform == 'web' }}
-        env:
-          RUSTFLAGS: -Ctarget-feature=+atomics,+bulk-memory,+mutable-globals
         run: |
           cargo binstall --locked --no-confirm --force wasm-bindgen-cli
           cargo binstall --locked --no-confirm --force wasm-opt
-          bevy build -Zbuild-std="std,core,alloc,panic_abort" --no-default-features true --locked --release --features='${{ matrix.features }}' --yes web --bundle
+          bevy build --no-default-features true --locked --release --features='${{ matrix.features }}' --yes web --bundle
           mv 'target/bevy_web/web-release/${{ env.cargo_build_binary_name }}' '${{ env.app }}'
 
       - name: Build and add binaries to app (non-Web)
         if: ${{ env.is_platform_enabled == 'true' && matrix.platform != 'web' }}
         run: |
           for target in ${{ matrix.targets }}; do
-            bevy build --locked --release --target="${target}" --features='${{ matrix.features }}'
+            bevy build --no-default-features true --locked --release --target="${target}" --features='${{ matrix.features }}'
             mv target/"${target}"/release/'${{ env.cargo_build_binary_name }}${{ matrix.binary_ext }}' tmp/binary/"${target}"'${{ matrix.binary_ext }}'
           done
           if [ '${{ matrix.platform }}' = 'macos' ]; then
