@@ -2254,4 +2254,34 @@
         sprite: None,
         worldly: false,
     ),
+    (
+        uid: (7),
+        instance: ("9c8ae4f0-3740-11f0-a813-2f8cc5145f59"),
+        xyz: (200.0, -456.0, 6.0),
+        sprite: Some((
+            image: "ldtk/../textures/horror-house.png",
+            tileset: (1),
+            atlas: Rect((
+                min: (0.0, 16.0),
+                max: (16.0, 48.0),
+            )),
+            pivot: (0.5, 0.5),
+        )),
+        worldly: true,
+    ),
+    (
+        uid: (84),
+        instance: ("ad5dd710-3740-11f0-a813-c3b52609ed04"),
+        xyz: (186.0, -461.0, 6.0),
+        sprite: Some((
+            image: "ldtk/../textures/furniture.png",
+            tileset: (59),
+            atlas: Rect((
+                min: (160.0, 768.0),
+                max: (176.0, 800.0),
+            )),
+            pivot: (0.5, 0.5),
+        )),
+        worldly: false,
+    ),
 ])

@@ -7,7 +7,8 @@ use bevy::platform::collections::HashMap;
 use bevy::prelude::*;
 use bevy_enhanced_input::events::Fired;
 use bevy_enhanced_input::prelude::Actions;
-use bevy_ldtk_scene::levels::LevelLoader;
+use bevy_ldtk_scene::levels::{Level, LevelLoader};
+use bevy_ldtk_scene::world::LevelUid;
 use bevy_optix::camera::MainCamera;
 use bevy_optix::pixel_perfect::HIGH_RES_LAYER;
 use bevy_seedling::prelude::Volume;
@@ -24,6 +25,7 @@ use crate::player::{Player, PlayerCollider, PlayerContext};
 use crate::textbox::{TextBlurb, TextboxEvent};
 use crate::{GameState, HexColor, Layer, TILE_SIZE, world};
 
+mod bathroom;
 mod pills;
 mod visitor;
 
@@ -31,20 +33,36 @@ pub struct LevelPlugin;
 
 impl Plugin for LevelPlugin {
     fn build(&self, app: &mut App) {
-        app.add_plugins((pills::PillsPlugin, visitor::VisitorPlugin))
-            .register_required_components::<world::Teleport, Teleporter>()
-            .register_required_components::<world::LunaDoor, VerticalDoor>()
-            .register_required_components::<world::HallDoor1, VerticalDoor>()
-            .register_required_components::<world::FrontDoor, VerticalDoor>()
-            .register_required_components::<world::SideDoor1, Door>()
-            .register_required_components::<world::SideDoor2, Door>()
-            .register_required_components::<world::BathroomDoor, VerticalDoor>()
-            .register_required_components::<world::BathroomExitDoor, VerticalDoor>()
-            .register_required_components::<world::CrackedSideDoor1, Door>()
-            .add_systems(Update, (add_tile_collision, manage_transitions))
-            .add_systems(OnEnter(GameState::Playing), load_ldtk)
-            .add_observer(teleport)
-            .add_observer(door);
+        app.add_plugins((
+            pills::PillsPlugin,
+            visitor::VisitorPlugin,
+            bathroom::BathroomPlugin,
+        ))
+        .register_required_components::<world::Teleport, Teleporter>()
+        .register_required_components::<world::LunaDoor, VerticalDoor>()
+        .register_required_components::<world::HallDoor1, VerticalDoor>()
+        .register_required_components::<world::FrontDoor, VerticalDoor>()
+        .register_required_components::<world::SideDoor1, Door>()
+        .register_required_components::<world::SideDoor2, Door>()
+        .register_required_components::<world::BathroomDoor, VerticalDoor>()
+        .register_required_components::<world::BathroomExitDoor, VerticalDoor>()
+        .register_required_components::<world::CrackedSideDoor1, Door>()
+        .add_systems(Update, (add_tile_collision, manage_transitions))
+        .add_systems(OnEnter(GameState::Playing), load_ldtk)
+        .add_observer(teleport)
+        .add_observer(door);
+    }
+}
+
+pub fn in_level(uid: LevelUid) -> impl Fn(Query<&Level>) -> bool {
+    move |levels| {
+        for level in levels.iter() {
+            if level.uid() == uid {
+                return true;
+            }
+        }
+
+        false
     }
 }
 
@@ -204,6 +222,9 @@ struct VerticalDoor;
 )]
 struct Door;
 
+#[derive(Default, Component)]
+pub struct DoorDisabled;
+
 fn door(
     _: Trigger<Fired<InteractAction>>,
 
@@ -213,7 +234,12 @@ fn door(
     side_doors1: Query<(&world::SideDoor1, &CollidingEntities, &ChildOf)>,
     side_doors2: Query<(&world::SideDoor2, &CollidingEntities, &ChildOf)>,
     bathroom_door1: Query<(&world::BathroomDoor, &CollidingEntities, &ChildOf)>,
-    bathroom_door2: Query<(&world::BathroomExitDoor, &CollidingEntities, &ChildOf)>,
+    bathroom_door2: Query<(
+        &world::BathroomExitDoor,
+        &CollidingEntities,
+        &ChildOf,
+        Option<&DoorDisabled>,
+    )>,
     cracked_side_door1: Query<(&world::CrackedSideDoor1, &CollidingEntities, &ChildOf)>,
 
     player: Single<(Entity, &mut Transform), With<Player>>,
@@ -232,7 +258,15 @@ fn door(
         .chain(
             bathroom_door2
                 .iter()
-                .map(|(door, colliding, child_of)| (door.target, colliding, child_of, false, "")),
+                .map(|(door, colliding, child_of, disabled)| {
+                    (
+                        disabled.is_none().then_some(door.target).or(None).flatten(),
+                        colliding,
+                        child_of,
+                        false,
+                        "",
+                    )
+                }),
         )
         .chain(
             luna_door
@@ -273,7 +307,21 @@ fn door(
         .chain(
             cracked_side_door1
                 .iter()
-                .map(|(door, colliding, child_of)| (door.target, colliding, child_of, false, "")),
+                .map(|(door, colliding, child_of)| {
+                    let level_t = transforms.get(child_of.parent()).unwrap().translation();
+                    (
+                        door.target.or_else(|| {
+                            (door.x != 0.0 && door.y != 0.0).then_some(Vec2::new(
+                                (door.x - level_t.x) / 16.,
+                                -(-door.y - level_t.y) / 16.,
+                            ))
+                        }),
+                        colliding,
+                        child_of,
+                        false,
+                        door.load.as_str(),
+                    )
+                }),
         )
         .filter_map(|(target, colliding, child_of, luna, load)| {
             colliding
@@ -289,6 +337,16 @@ fn door(
                         Duration::from_secs(2),
                         |mut loader: Single<&mut LevelLoader>| {
                             loader.despawn(world::Level0);
+                        },
+                        &mut commands,
+                    );
+                }
+                "level2" => {
+                    loader.spawn(world::Level2);
+                    run_after(
+                        Duration::from_secs(2),
+                        |mut loader: Single<&mut LevelLoader>| {
+                            loader.despawn(world::Level1);
                         },
                         &mut commands,
                     );
@@ -345,7 +403,7 @@ fn load_ldtk(
     commands.spawn((
         bevy_ldtk_scene::HotWorld(server.load("ldtk/time-marches-on.ldtk")),
         bevy_ldtk_scene::World(server.load("ldtk/time-marches-on.ron")),
-        bevy_ldtk_scene::prelude::LevelLoader::levels(world::Level0),
+        bevy_ldtk_scene::prelude::LevelLoader::levels(world::Level1),
     ));
 }
 

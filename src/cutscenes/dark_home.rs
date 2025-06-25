@@ -2,7 +2,6 @@ use crate::cutscene::{
     chara::{Chara, Character},
     fragments::IntoBox,
 };
-use bevy::prelude::*;
 use bevy_sequence::prelude::*;
 
 pub fn sturgeon() -> impl IntoBox {

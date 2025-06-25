@@ -75,7 +75,7 @@ fn side_door(
     trigger: Trigger<OnAdd, Interacted>,
     side_door: Query<&world::CrackedSideDoor1>,
 
-    tree: Single<&GlobalTransform, With<world::Tree>>,
+    tree: Single<Entity, With<world::Tree>>,
 
     mut commands: Commands,
     server: Res<AssetServer>,
@@ -87,27 +87,23 @@ fn side_door(
         return;
     };
 
-    let position = tree.translation();
-    commands.spawn((
-        Transform::from_translation(position - Vec3::Y * 40.),
+    commands.entity(*tree).with_child((
+        Transform::from_translation(-Vec3::Y * 40.),
         PointLight2d {
             intensity: 0.6,
             radius: 150.,
             ..Default::default()
         },
+        NightSfx,
+        SamplePlayer::new(server.load("audio/sfx/night.ogg"))
+            .looping()
+            .with_volume(Volume::Linear(0.4)),
     ));
 
     commands.post_process::<MainCamera>(AmbientLight2d {
         brightness: 0.1,
         ..Default::default()
     });
-
-    commands.spawn((
-        NightSfx,
-        SamplePlayer::new(server.load("audio/sfx/night.ogg"))
-            .looping()
-            .with_volume(Volume::Linear(0.4)),
-    ));
 }
 
 #[derive(Default, Component)]

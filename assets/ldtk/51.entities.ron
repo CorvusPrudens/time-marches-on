@@ -1003,19 +1003,4 @@
         )),
         worldly: false,
     ),
-    (
-        uid: (7),
-        instance: ("1d117300-3740-11f0-98ab-893ccf072d79"),
-        xyz: (195.0, -462.0, 6.0),
-        sprite: Some((
-            image: "ldtk/../textures/horror-house.png",
-            tileset: (1),
-            atlas: Rect((
-                min: (0.0, 16.0),
-                max: (16.0, 48.0),
-            )),
-            pivot: (0.5, 0.5),
-        )),
-        worldly: true,
-    ),
 ])
