@@ -85,6 +85,7 @@ fn main() {
         bevy_ldtk_scene::LdtkScenePlugin,
         world::TimeMarchesOnPlugin,
         bevy_sequence::SequencePlugin,
+        bevy_light_2d::plugin::Light2dPlugin,
         //bevy_egui::EguiPlugin {
         //    enable_multipass_for_primary_context: true,
         //},

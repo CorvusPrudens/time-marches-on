@@ -2,7 +2,7 @@
     (
         uid: (61),
         instance: ("b7dc2bf0-3740-11f0-80ab-37f528ebba0e"),
-        xyz: (288.0, -160.0, 5.0),
+        xyz: (288.0, -160.0, 6.0),
         sprite: Some((
             image: "ldtk/../textures/furniture.png",
             tileset: (59),
@@ -17,7 +17,7 @@
     (
         uid: (62),
         instance: ("143a9080-3740-11f0-80ab-d36c2bbc334e"),
-        xyz: (1041.0, -549.0, 5.0),
+        xyz: (1041.0, -549.0, 6.0),
         sprite: Some((
             image: "ldtk/../textures/furniture.png",
             tileset: (59),
@@ -32,7 +32,7 @@
     (
         uid: (63),
         instance: ("e8788f40-3740-11f0-910e-4b6ba9ec3e93"),
-        xyz: (352.0, -144.0, 5.0),
+        xyz: (352.0, -144.0, 6.0),
         sprite: Some((
             image: "ldtk/../textures/horror-house.png",
             tileset: (1),
@@ -47,7 +47,7 @@
     (
         uid: (64),
         instance: ("14087210-3740-11f0-910e-b76f6db3a299"),
-        xyz: (377.0, -128.0, 5.0),
+        xyz: (377.0, -128.0, 6.0),
         sprite: Some((
             image: "ldtk/../textures/furniture.png",
             tileset: (59),
@@ -62,7 +62,7 @@
     (
         uid: (64),
         instance: ("15e19ee0-3740-11f0-910e-f7575d2dc8e6"),
-        xyz: (361.0, -128.0, 5.0),
+        xyz: (361.0, -128.0, 6.0),
         sprite: Some((
             image: "ldtk/../textures/furniture.png",
             tileset: (59),
@@ -77,7 +77,7 @@
     (
         uid: (65),
         instance: ("291f9d90-3740-11f0-910e-53a08685ee8f"),
-        xyz: (362.0, -160.0, 5.0),
+        xyz: (362.0, -160.0, 6.0),
         sprite: Some((
             image: "ldtk/../textures/furniture.png",
             tileset: (59),
@@ -92,7 +92,7 @@
     (
         uid: (65),
         instance: ("3ddd8580-3740-11f0-910e-6d2ecc9c0005"),
-        xyz: (377.0, -160.0, 5.0),
+        xyz: (377.0, -160.0, 6.0),
         sprite: Some((
             image: "ldtk/../textures/furniture.png",
             tileset: (59),
@@ -107,7 +107,7 @@
     (
         uid: (67),
         instance: ("37058c70-3740-11f0-910e-85648b9d69d7"),
-        xyz: (400.0, -224.0, 5.0),
+        xyz: (400.0, -224.0, 6.0),
         sprite: Some((
             image: "ldtk/../textures/furniture.png",
             tileset: (59),
@@ -122,7 +122,7 @@
     (
         uid: (69),
         instance: ("08b1d940-3740-11f0-910e-93037d8adc01"),
-        xyz: (389.0, -240.0, 5.0),
+        xyz: (389.0, -240.0, 6.0),
         sprite: Some((
             image: "ldtk/../textures/furniture.png",
             tileset: (59),
@@ -137,7 +137,7 @@
     (
         uid: (70),
         instance: ("62a8b3b0-3740-11f0-910e-c7a2291cb1ff"),
-        xyz: (448.0, -320.0, 5.0),
+        xyz: (448.0, -320.0, 6.0),
         sprite: Some((
             image: "ldtk/../textures/furniture.png",
             tileset: (59),
@@ -152,7 +152,7 @@
     (
         uid: (71),
         instance: ("baa65630-3740-11f0-910e-478a78ced448"),
-        xyz: (448.0, -384.0, 5.0),
+        xyz: (448.0, -384.0, 6.0),
         sprite: Some((
             image: "ldtk/../textures/furniture.png",
             tileset: (59),
@@ -167,7 +167,7 @@
     (
         uid: (68),
         instance: ("e4f79e80-3740-11f0-910e-e5cfcf804407"),
-        xyz: (494.0, -353.0, 5.0),
+        xyz: (494.0, -353.0, 6.0),
         sprite: Some((
             image: "ldtk/../textures/furniture.png",
             tileset: (59),
@@ -182,7 +182,7 @@
     (
         uid: (73),
         instance: ("645f6ef0-3740-11f0-910e-4174c8de88d9"),
-        xyz: (208.0, -256.0, 5.0),
+        xyz: (208.0, -256.0, 6.0),
         sprite: Some((
             image: "ldtk/../textures/furniture.png",
             tileset: (59),
@@ -197,7 +197,7 @@
     (
         uid: (74),
         instance: ("95772eb0-3740-11f0-910e-1b8036add865"),
-        xyz: (184.0, -262.0, 5.0),
+        xyz: (184.0, -262.0, 6.0),
         sprite: Some((
             image: "ldtk/../textures/furniture.png",
             tileset: (59),
@@ -212,7 +212,7 @@
     (
         uid: (75),
         instance: ("a34bade0-3740-11f0-910e-cf97d16d170b"),
-        xyz: (160.0, -256.0, 5.0),
+        xyz: (160.0, -256.0, 6.0),
         sprite: Some((
             image: "ldtk/../textures/furniture.png",
             tileset: (59),
@@ -227,7 +227,7 @@
     (
         uid: (76),
         instance: ("db91a790-3740-11f0-910e-ab76d5e6610c"),
-        xyz: (144.0, -352.0, 5.0),
+        xyz: (144.0, -352.0, 6.0),
         sprite: Some((
             image: "ldtk/../textures/furniture.png",
             tileset: (59),
@@ -242,7 +242,7 @@
     (
         uid: (77),
         instance: ("01638240-3740-11f0-910e-114132ff58dd"),
-        xyz: (146.0, -337.0, 5.0),
+        xyz: (146.0, -337.0, 6.0),
         sprite: Some((
             image: "ldtk/../textures/furniture.png",
             tileset: (59),
@@ -257,7 +257,7 @@
     (
         uid: (78),
         instance: ("60aad5f0-3740-11f0-910e-632ee7606258"),
-        xyz: (187.0, -301.0, 5.0),
+        xyz: (187.0, -301.0, 6.0),
         sprite: Some((
             image: "ldtk/../textures/furniture.png",
             tileset: (59),
@@ -272,7 +272,7 @@
     (
         uid: (83),
         instance: ("53ba9e70-3740-11f0-b73a-4b2c4975420b"),
-        xyz: (518.0, -218.0, 5.0),
+        xyz: (518.0, -218.0, 6.0),
         sprite: Some((
             image: "ldtk/../textures/furniture.png",
             tileset: (59),
@@ -287,7 +287,7 @@
     (
         uid: (84),
         instance: ("6d4d3ff0-3740-11f0-b73a-f36de592b23f"),
-        xyz: (186.0, -466.0, 5.0),
+        xyz: (186.0, -466.0, 6.0),
         sprite: Some((
             image: "ldtk/../textures/furniture.png",
             tileset: (59),
@@ -302,7 +302,7 @@
     (
         uid: (84),
         instance: ("c9de9b60-3740-11f0-b73a-ff55836f5020"),
-        xyz: (761.0, -591.0, 5.0),
+        xyz: (761.0, -591.0, 6.0),
         sprite: Some((
             image: "ldtk/../textures/furniture.png",
             tileset: (59),
@@ -317,7 +317,7 @@
     (
         uid: (83),
         instance: ("cf5e8910-3740-11f0-b73a-bdf2751749b2"),
-        xyz: (1127.0, -591.0, 5.0),
+        xyz: (1127.0, -591.0, 6.0),
         sprite: Some((
             image: "ldtk/../textures/furniture.png",
             tileset: (59),
@@ -332,7 +332,7 @@
     (
         uid: (88),
         instance: ("c755e1b0-3740-11f0-8402-8b1eb4ee82d1"),
-        xyz: (312.0, -437.0, 5.0),
+        xyz: (312.0, -437.0, 6.0),
         sprite: Some((
             image: "ldtk/../textures/furniture.png",
             tileset: (59),
@@ -347,7 +347,7 @@
     (
         uid: (89),
         instance: ("1003afa0-3740-11f0-8402-671b1c6699ed"),
-        xyz: (840.0, -549.0, 5.0),
+        xyz: (840.0, -549.0, 6.0),
         sprite: Some((
             image: "ldtk/../textures/furniture.png",
             tileset: (59),
@@ -362,7 +362,7 @@
     (
         uid: (90),
         instance: ("2e12ffa0-3740-11f0-8402-6714053e042e"),
-        xyz: (328.0, -117.0, 5.0),
+        xyz: (328.0, -117.0, 6.0),
         sprite: Some((
             image: "ldtk/../textures/furniture.png",
             tileset: (59),
@@ -377,7 +377,7 @@
     (
         uid: (91),
         instance: ("dbd36fd0-3740-11f0-8402-45a99ca2215d"),
-        xyz: (802.0, -106.0, 5.0),
+        xyz: (802.0, -106.0, 6.0),
         sprite: Some((
             image: "ldtk/../textures/furniture.png",
             tileset: (59),
@@ -392,7 +392,7 @@
     (
         uid: (92),
         instance: ("3c6f2ff0-3740-11f0-8402-c7ab5ffc6bf8"),
-        xyz: (784.0, -112.0, 5.0),
+        xyz: (784.0, -112.0, 6.0),
         sprite: Some((
             image: "ldtk/../textures/furniture.png",
             tileset: (59),
@@ -407,7 +407,7 @@
     (
         uid: (93),
         instance: ("4e558de0-3740-11f0-8402-231ce5b99a32"),
-        xyz: (784.0, -96.0, 5.0),
+        xyz: (784.0, -96.0, 6.0),
         sprite: Some((
             image: "ldtk/../textures/furniture.png",
             tileset: (59),
@@ -422,7 +422,7 @@
     (
         uid: (94),
         instance: ("6e1d1530-3740-11f0-8402-d5c579da80a4"),
-        xyz: (816.0, -96.0, 5.0),
+        xyz: (816.0, -96.0, 6.0),
         sprite: Some((
             image: "ldtk/../textures/furniture.png",
             tileset: (59),
@@ -437,7 +437,7 @@
     (
         uid: (95),
         instance: ("c1bd02e0-3740-11f0-8402-5d6f46d49b79"),
-        xyz: (398.0, -281.0, 5.0),
+        xyz: (398.0, -281.0, 6.0),
         sprite: Some((
             image: "ldtk/../textures/furniture.png",
             tileset: (59),
@@ -452,7 +452,7 @@
     (
         uid: (96),
         instance: ("1c2e1660-3740-11f0-8402-23965920fd41"),
-        xyz: (808.0, -178.0, 5.0),
+        xyz: (808.0, -178.0, 6.0),
         sprite: Some((
             image: "ldtk/../textures/furniture.png",
             tileset: (59),
@@ -467,7 +467,7 @@
     (
         uid: (101),
         instance: ("d4fd3230-3740-11f0-8402-9763e67ff6a3"),
-        xyz: (787.0, -107.0, 5.0),
+        xyz: (787.0, -107.0, 6.0),
         sprite: Some((
             image: "ldtk/../textures/furniture.png",
             tileset: (59),
@@ -482,14 +482,14 @@
     (
         uid: (102),
         instance: ("ea059700-3740-11f0-8402-a975ae2a40e0"),
-        xyz: (395.0, -282.0, 5.0),
+        xyz: (395.0, -282.0, 6.0),
         sprite: None,
         worldly: false,
     ),
     (
         uid: (105),
         instance: ("ed50ea10-3740-11f0-8402-3ba6ff717d2f"),
-        xyz: (518.0, -218.0, 5.0),
+        xyz: (518.0, -218.0, 6.0),
         sprite: Some((
             image: "ldtk/../textures/furniture.png",
             tileset: (59),
@@ -504,7 +504,7 @@
     (
         uid: (61),
         instance: ("6fce6221-3740-11f0-8402-0302f8c03c9a"),
-        xyz: (288.0, -848.0, 5.0),
+        xyz: (288.0, -848.0, 6.0),
         sprite: Some((
             image: "ldtk/../textures/furniture.png",
             tileset: (59),
@@ -519,7 +519,7 @@
     (
         uid: (62),
         instance: ("6fce6222-3740-11f0-8402-87d25693f368"),
-        xyz: (1041.0, -1237.0, 5.0),
+        xyz: (1041.0, -1237.0, 6.0),
         sprite: Some((
             image: "ldtk/../textures/furniture.png",
             tileset: (59),
@@ -534,7 +534,7 @@
     (
         uid: (63),
         instance: ("6fce6223-3740-11f0-8402-67b6e95970a1"),
-        xyz: (352.0, -832.0, 5.0),
+        xyz: (352.0, -832.0, 6.0),
         sprite: Some((
             image: "ldtk/../textures/horror-house.png",
             tileset: (1),
@@ -549,7 +549,7 @@
     (
         uid: (64),
         instance: ("6fce8930-3740-11f0-8402-cd39025b5bfc"),
-        xyz: (377.0, -816.0, 5.0),
+        xyz: (377.0, -816.0, 6.0),
         sprite: Some((
             image: "ldtk/../textures/furniture.png",
             tileset: (59),
@@ -564,7 +564,7 @@
     (
         uid: (64),
         instance: ("6fce8931-3740-11f0-8402-43a14a2b470b"),
-        xyz: (361.0, -816.0, 5.0),
+        xyz: (361.0, -816.0, 6.0),
         sprite: Some((
             image: "ldtk/../textures/furniture.png",
             tileset: (59),
@@ -579,7 +579,7 @@
     (
         uid: (65),
         instance: ("6fce8932-3740-11f0-8402-1faec3c58620"),
-        xyz: (362.0, -848.0, 5.0),
+        xyz: (362.0, -848.0, 6.0),
         sprite: Some((
             image: "ldtk/../textures/furniture.png",
             tileset: (59),
@@ -594,7 +594,7 @@
     (
         uid: (65),
         instance: ("6fce8933-3740-11f0-8402-a7f3365c41b1"),
-        xyz: (377.0, -848.0, 5.0),
+        xyz: (377.0, -848.0, 6.0),
         sprite: Some((
             image: "ldtk/../textures/furniture.png",
             tileset: (59),
@@ -609,7 +609,7 @@
     (
         uid: (67),
         instance: ("6fceb040-3740-11f0-8402-e5116722d024"),
-        xyz: (400.0, -912.0, 5.0),
+        xyz: (400.0, -912.0, 6.0),
         sprite: Some((
             image: "ldtk/../textures/furniture.png",
             tileset: (59),
@@ -624,7 +624,7 @@
     (
         uid: (69),
         instance: ("6fceb041-3740-11f0-8402-411ced63e866"),
-        xyz: (389.0, -928.0, 5.0),
+        xyz: (389.0, -928.0, 6.0),
         sprite: Some((
             image: "ldtk/../textures/furniture.png",
             tileset: (59),
@@ -639,7 +639,7 @@
     (
         uid: (70),
         instance: ("6fceb042-3740-11f0-8402-eb8b26df47ef"),
-        xyz: (448.0, -1008.0, 5.0),
+        xyz: (448.0, -1008.0, 6.0),
         sprite: Some((
             image: "ldtk/../textures/furniture.png",
             tileset: (59),
@@ -654,7 +654,7 @@
     (
         uid: (71),
         instance: ("6fceb043-3740-11f0-8402-e7a259d9e5e8"),
-        xyz: (448.0, -1072.0, 5.0),
+        xyz: (448.0, -1072.0, 6.0),
         sprite: Some((
             image: "ldtk/../textures/furniture.png",
             tileset: (59),
@@ -669,7 +669,7 @@
     (
         uid: (68),
         instance: ("6fced750-3740-11f0-8402-3992fd1ab903"),
-        xyz: (494.0, -1041.0, 5.0),
+        xyz: (494.0, -1041.0, 6.0),
         sprite: Some((
             image: "ldtk/../textures/furniture.png",
             tileset: (59),
@@ -684,7 +684,7 @@
     (
         uid: (73),
         instance: ("6fced751-3740-11f0-8402-d5ce95d4c004"),
-        xyz: (160.0, -944.0, 5.0),
+        xyz: (160.0, -944.0, 6.0),
         sprite: Some((
             image: "ldtk/../textures/furniture.png",
             tileset: (59),
@@ -699,7 +699,7 @@
     (
         uid: (74),
         instance: ("6fced752-3740-11f0-8402-2bab0b627892"),
-        xyz: (184.0, -950.0, 5.0),
+        xyz: (184.0, -950.0, 6.0),
         sprite: Some((
             image: "ldtk/../textures/furniture.png",
             tileset: (59),
@@ -714,7 +714,7 @@
     (
         uid: (75),
         instance: ("6fced753-3740-11f0-8402-0ff459ecf912"),
-        xyz: (208.0, -944.0, 5.0),
+        xyz: (208.0, -944.0, 6.0),
         sprite: Some((
             image: "ldtk/../textures/furniture.png",
             tileset: (59),
@@ -729,7 +729,7 @@
     (
         uid: (76),
         instance: ("6fced754-3740-11f0-8402-63e22681739d"),
-        xyz: (144.0, -1040.0, 5.0),
+        xyz: (144.0, -1040.0, 6.0),
         sprite: Some((
             image: "ldtk/../textures/furniture.png",
             tileset: (59),
@@ -744,7 +744,7 @@
     (
         uid: (77),
         instance: ("6fcefe60-3740-11f0-8402-8fa13b191487"),
-        xyz: (146.0, -1025.0, 5.0),
+        xyz: (146.0, -1025.0, 6.0),
         sprite: Some((
             image: "ldtk/../textures/furniture.png",
             tileset: (59),
@@ -759,7 +759,7 @@
     (
         uid: (78),
         instance: ("6fcefe61-3740-11f0-8402-d9da15a61819"),
-        xyz: (187.0, -989.0, 5.0),
+        xyz: (187.0, -989.0, 6.0),
         sprite: Some((
             image: "ldtk/../textures/furniture.png",
             tileset: (59),
@@ -774,7 +774,7 @@
     (
         uid: (83),
         instance: ("6fcefe62-3740-11f0-8402-efabc5028a34"),
-        xyz: (518.0, -906.0, 5.0),
+        xyz: (518.0, -906.0, 6.0),
         sprite: Some((
             image: "ldtk/../textures/furniture.png",
             tileset: (59),
@@ -789,7 +789,7 @@
     (
         uid: (84),
         instance: ("6fcefe63-3740-11f0-8402-9d2a98f380d7"),
-        xyz: (186.0, -1154.0, 5.0),
+        xyz: (186.0, -1154.0, 6.0),
         sprite: Some((
             image: "ldtk/../textures/furniture.png",
             tileset: (59),
@@ -804,7 +804,7 @@
     (
         uid: (84),
         instance: ("6fcf2570-3740-11f0-8402-5939b4c20a7b"),
-        xyz: (761.0, -1279.0, 5.0),
+        xyz: (761.0, -1279.0, 6.0),
         sprite: Some((
             image: "ldtk/../textures/furniture.png",
             tileset: (59),
@@ -819,7 +819,7 @@
     (
         uid: (83),
         instance: ("6fcf2571-3740-11f0-8402-f52345c1466a"),
-        xyz: (1127.0, -1279.0, 5.0),
+        xyz: (1127.0, -1279.0, 6.0),
         sprite: Some((
             image: "ldtk/../textures/furniture.png",
             tileset: (59),
@@ -834,7 +834,7 @@
     (
         uid: (88),
         instance: ("6fcf2572-3740-11f0-8402-9f2ad79641b4"),
-        xyz: (312.0, -1125.0, 5.0),
+        xyz: (312.0, -1125.0, 6.0),
         sprite: Some((
             image: "ldtk/../textures/furniture.png",
             tileset: (59),
@@ -849,7 +849,7 @@
     (
         uid: (89),
         instance: ("6fcf2573-3740-11f0-8402-2728352c2d0f"),
-        xyz: (840.0, -1237.0, 5.0),
+        xyz: (840.0, -1237.0, 6.0),
         sprite: Some((
             image: "ldtk/../textures/furniture.png",
             tileset: (59),
@@ -864,7 +864,7 @@
     (
         uid: (90),
         instance: ("6fcf4c80-3740-11f0-8402-51d87ffdbac7"),
-        xyz: (328.0, -805.0, 5.0),
+        xyz: (328.0, -805.0, 6.0),
         sprite: Some((
             image: "ldtk/../textures/furniture.png",
             tileset: (59),
@@ -879,7 +879,7 @@
     (
         uid: (91),
         instance: ("6fcf4c81-3740-11f0-8402-1bf615a33561"),
-        xyz: (802.0, -794.0, 5.0),
+        xyz: (802.0, -794.0, 6.0),
         sprite: Some((
             image: "ldtk/../textures/furniture.png",
             tileset: (59),
@@ -894,7 +894,7 @@
     (
         uid: (92),
         instance: ("6fcf4c82-3740-11f0-8402-1f2b800b2a66"),
-        xyz: (784.0, -800.0, 5.0),
+        xyz: (784.0, -800.0, 6.0),
         sprite: Some((
             image: "ldtk/../textures/furniture.png",
             tileset: (59),
@@ -909,7 +909,7 @@
     (
         uid: (93),
         instance: ("6fcf4c83-3740-11f0-8402-39b83c990413"),
-        xyz: (784.0, -784.0, 5.0),
+        xyz: (784.0, -784.0, 6.0),
         sprite: Some((
             image: "ldtk/../textures/furniture.png",
             tileset: (59),
@@ -924,7 +924,7 @@
     (
         uid: (94),
         instance: ("6fcf4c84-3740-11f0-8402-ab43286240cf"),
-        xyz: (816.0, -784.0, 5.0),
+        xyz: (816.0, -784.0, 6.0),
         sprite: Some((
             image: "ldtk/../textures/furniture.png",
             tileset: (59),
@@ -939,7 +939,7 @@
     (
         uid: (95),
         instance: ("6fcf7390-3740-11f0-8402-efdbac66b611"),
-        xyz: (398.0, -969.0, 5.0),
+        xyz: (398.0, -969.0, 6.0),
         sprite: Some((
             image: "ldtk/../textures/furniture.png",
             tileset: (59),
@@ -954,7 +954,7 @@
     (
         uid: (96),
         instance: ("6fcf7391-3740-11f0-8402-0fe96b96b311"),
-        xyz: (808.0, -866.0, 5.0),
+        xyz: (808.0, -866.0, 6.0),
         sprite: Some((
             image: "ldtk/../textures/furniture.png",
             tileset: (59),
@@ -969,14 +969,14 @@
     (
         uid: (102),
         instance: ("6fcf7393-3740-11f0-8402-f18b0eb10ada"),
-        xyz: (395.0, -970.0, 5.0),
+        xyz: (395.0, -970.0, 6.0),
         sprite: None,
         worldly: false,
     ),
     (
         uid: (105),
         instance: ("6fcf9aa0-3740-11f0-8402-6de51fe65fa0"),
-        xyz: (518.0, -906.0, 5.0),
+        xyz: (518.0, -906.0, 6.0),
         sprite: Some((
             image: "ldtk/../textures/furniture.png",
             tileset: (59),
@@ -991,7 +991,7 @@
     (
         uid: (101),
         instance: ("0202aac0-3740-11f0-8402-977e7fbae0d4"),
-        xyz: (360.0, -834.0, 5.0),
+        xyz: (360.0, -834.0, 6.0),
         sprite: Some((
             image: "ldtk/../textures/furniture.png",
             tileset: (59),
@@ -1006,7 +1006,22 @@
     (
         uid: (7),
         instance: ("26c147d0-3740-11f0-8f55-2fe6aea23b1e"),
-        xyz: (200.0, -344.0, 5.0),
+        xyz: (840.0, -1272.0, 6.0),
+        sprite: Some((
+            image: "ldtk/../textures/horror-house.png",
+            tileset: (1),
+            atlas: Rect((
+                min: (0.0, 16.0),
+                max: (16.0, 48.0),
+            )),
+            pivot: (0.5, 0.5),
+        )),
+        worldly: true,
+    ),
+    (
+        uid: (7),
+        instance: ("1d117300-3740-11f0-98ab-893ccf072d79"),
+        xyz: (195.0, -462.0, 6.0),
         sprite: Some((
             image: "ldtk/../textures/horror-house.png",
             tileset: (1),

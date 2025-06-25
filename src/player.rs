@@ -13,7 +13,7 @@ use rand::Rng;
 use crate::animation::{AnimationAppExt, AnimationController, AnimationSprite};
 use crate::{Layer, world};
 
-const PLAYER_SPEED: f32 = 70.;
+pub const PLAYER_SPEED: f32 = 70.;
 
 pub struct PlayerPlugin;
 
@@ -77,7 +77,7 @@ impl Player {
 }
 
 #[derive(Component)]
-struct Scaled(Vec2);
+pub struct Scaled(pub Vec2);
 
 fn scaled(mut commands: Commands, mut entities: Query<(Entity, &mut Transform, &Scaled)>) {
     for (entity, mut transform, scaled) in entities.iter_mut() {

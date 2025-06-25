@@ -10,6 +10,7 @@
         },
         composites: {
             ((110), (2)): "ldtk/Level_1_BackgroundComposite_composite.png",
+            ((110), (114)): "ldtk/Level_1_ParkBackgroundComposite_composite.png",
             ((51), (2)): "ldtk/Level_0_BackgroundComposite_composite.png",
         },
     ),

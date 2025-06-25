@@ -96,6 +96,7 @@ bevy_asset_loader = { version = "0.23.0" }
 bevy_tween = "0.8.0"
 bevy_enhanced_input = "0.11"
 serde = "1.0.219"
+bevy_light_2d = "0.6.0"
 # bevy_egui = "0.34.1"
 # bevy-inspector-egui = "0.31.0"
 

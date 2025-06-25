@@ -7,17 +7,19 @@ use bevy::platform::collections::HashMap;
 use bevy::prelude::*;
 use bevy_enhanced_input::events::Fired;
 use bevy_enhanced_input::prelude::Actions;
+use bevy_ldtk_scene::levels::LevelLoader;
 use bevy_optix::camera::MainCamera;
 use bevy_optix::pixel_perfect::HIGH_RES_LAYER;
 use bevy_seedling::prelude::Volume;
 use bevy_seedling::sample::SamplePlayer;
+use bevy_sequence::combinators::delay::run_after;
 use bevy_tween::combinator::{sequence, tween};
 use bevy_tween::interpolate::sprite_color_to;
 use bevy_tween::prelude::{AnimationBuilderExt, EaseKind};
 use bevy_tween::tween::IntoTarget;
 
 use crate::callback::Callback;
-use crate::interactions::InteractAction;
+use crate::interactions::{InteractAction, Interactable};
 use crate::player::{Player, PlayerCollider, PlayerContext};
 use crate::textbox::{TextBlurb, TextboxEvent};
 use crate::{GameState, HexColor, Layer, TILE_SIZE, world};
@@ -197,7 +199,8 @@ struct VerticalDoor;
     Collider::rectangle(24., 24.),
     Sensor,
     CollidingEntities,
-    CollisionLayers::new(Layer::Default, Layer::Player)
+    CollisionLayers::new(Layer::Default, Layer::Player),
+    Interactable
 )]
 struct Door;
 
@@ -220,51 +223,80 @@ fn door(
 
     mut commands: Commands,
     server: Res<AssetServer>,
+
+    mut loader: Single<&mut LevelLoader>,
 ) -> Result {
-    for (target, child_of, luna) in bathroom_door1
+    for (target, child_of, luna, load) in bathroom_door1
         .iter()
-        .map(|(door, colliding, child_of)| (door.target, colliding, child_of, false))
+        .map(|(door, colliding, child_of)| (door.target, colliding, child_of, false, ""))
         .chain(
             bathroom_door2
                 .iter()
-                .map(|(door, colliding, child_of)| (door.target, colliding, child_of, false)),
+                .map(|(door, colliding, child_of)| (door.target, colliding, child_of, false, "")),
         )
         .chain(
             luna_door
                 .iter()
-                .map(|(door, colliding, child_of)| (door.target, colliding, child_of, true)),
+                .map(|(door, colliding, child_of)| (door.target, colliding, child_of, true, "")),
         )
         .chain(
             side_doors1
                 .iter()
-                .map(|(door, colliding, child_of)| (door.target, colliding, child_of, false)),
+                .map(|(door, colliding, child_of)| (door.target, colliding, child_of, false, "")),
         )
         .chain(
             side_doors2
                 .iter()
-                .map(|(door, colliding, child_of)| (door.target, colliding, child_of, false)),
+                .map(|(door, colliding, child_of)| (door.target, colliding, child_of, false, "")),
         )
-        .chain(
-            hall_doors1
-                .iter()
-                .map(|(door, colliding, child_of)| (door.target, colliding, child_of, false)),
-        )
+        .chain(hall_doors1.iter().map(|(door, colliding, child_of)| {
+            let level_t = transforms.get(child_of.parent()).unwrap().translation();
+
+            (
+                door.target.or_else(|| {
+                    (door.x != 0.0 && door.y != 0.0).then_some(Vec2::new(
+                        (door.x - level_t.x) / 16.,
+                        -(-door.y - level_t.y) / 16.,
+                    ))
+                }),
+                colliding,
+                child_of,
+                false,
+                door.load.as_str(),
+            )
+        }))
         .chain(
             hall_doors2
                 .iter()
-                .map(|(door, colliding, child_of)| (door.target, colliding, child_of, false)),
+                .map(|(door, colliding, child_of)| (door.target, colliding, child_of, false, "")),
         )
         .chain(
             cracked_side_door1
                 .iter()
-                .map(|(door, colliding, child_of)| (door.target, colliding, child_of, false)),
+                .map(|(door, colliding, child_of)| (door.target, colliding, child_of, false, "")),
         )
-        .filter_map(|(target, colliding, child_of, luna)| {
+        .filter_map(|(target, colliding, child_of, luna, load)| {
             colliding
                 .contains(&*player_collider)
-                .then_some((target, child_of, luna))
+                .then_some((target, child_of, luna, load))
         })
     {
+        if !load.is_empty() {
+            match load {
+                "level1" => {
+                    loader.spawn(world::Level1);
+                    run_after(
+                        Duration::from_secs(2),
+                        |mut loader: Single<&mut LevelLoader>| {
+                            loader.despawn(world::Level0);
+                        },
+                        &mut commands,
+                    );
+                }
+                _ => panic!("{}", load),
+            }
+        }
+
         match target {
             Some(target) => {
                 let level_t = transforms.get(child_of.parent())?.translation();
@@ -313,8 +345,7 @@ fn load_ldtk(
     commands.spawn((
         bevy_ldtk_scene::HotWorld(server.load("ldtk/time-marches-on.ldtk")),
         bevy_ldtk_scene::World(server.load("ldtk/time-marches-on.ron")),
-        //bevy_ldtk_scene::prelude::LevelLoader::levels(world::Level0),
-        bevy_ldtk_scene::prelude::LevelLoader::levels(world::Level1),
+        bevy_ldtk_scene::prelude::LevelLoader::levels(world::Level0),
     ));
 }
 
