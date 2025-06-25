@@ -12,6 +12,8 @@ pub enum Chara {
     Father,
     Luna,
     Stranger,
+    Sturgeon,
+    Shadow,
 }
 
 impl Chara {
@@ -21,6 +23,8 @@ impl Chara {
             Self::Father => Some(CharacterSprite::new("main.png")),
             Self::Luna => Some(CharacterSprite::new("luna.png")),
             Self::Stranger => None,
+            Self::Sturgeon => Some(CharacterSprite::new("sturgeon.png")),
+            Self::Shadow => Some(CharacterSprite::new("shadow.png")),
         }
     }
 
@@ -48,7 +52,7 @@ impl Chara {
             }),
             Self::Luna => Arc::new(move |commands, server| {
                 commands.spawn((
-                    PitchRange::new(0.02),
+                    PitchRange(0.75..0.85),
                     SamplePlayer {
                         sample: server.load(glyph_sample("high.wav")),
                         volume: Volume::Linear(0.5),
@@ -59,6 +63,16 @@ impl Chara {
             Self::Stranger => Arc::new(move |commands, server| {
                 commands.spawn((
                     PitchRange(0.75..0.85),
+                    SamplePlayer {
+                        sample: server.load(glyph_sample("low.wav")),
+                        volume: Volume::Linear(0.5),
+                        ..Default::default()
+                    },
+                ));
+            }),
+            Self::Sturgeon | Self::Shadow => Arc::new(move |commands, server| {
+                commands.spawn((
+                    PitchRange(0.45..0.75),
                     SamplePlayer {
                         sample: server.load(glyph_sample("low.wav")),
                         volume: Volume::Linear(0.5),
@@ -97,6 +111,10 @@ where
 
     fn stranger(self) -> impl IntoBox<C> {
         self.chara(Chara::Stranger)
+    }
+
+    fn shadow(self) -> impl IntoBox<C> {
+        self.chara(Chara::Shadow)
     }
 }
 

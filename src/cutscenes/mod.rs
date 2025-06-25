@@ -4,6 +4,8 @@ use std::time::Duration;
 
 use crate::cutscene::fragments::IntoBox;
 
+pub mod dark_home;
+pub mod park_man;
 pub mod tea;
 pub mod visitor;
 
