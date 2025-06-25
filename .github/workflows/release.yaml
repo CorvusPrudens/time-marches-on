@@ -189,7 +189,6 @@ jobs:
         if: ${{ matrix.platform == 'web' }}
         run: |
           printf '[toolchain]\nchannel = "nightly-2025-06-01"' > rust-toolchain.toml
-          mv .wasm-cargo .cargo
 
       - name: Restore Rust cache
         if: ${{ env.is_platform_enabled == 'true' && env.use_github_cache == 'true' }}
