@@ -2233,4 +2233,25 @@
         sprite: None,
         worldly: false,
     ),
+    (
+        uid: (125),
+        instance: ("c350b300-3740-11f0-97c8-13e7803e1be3"),
+        xyz: (304.0, -464.0, 6.0),
+        sprite: None,
+        worldly: false,
+    ),
+    (
+        uid: (126),
+        instance: ("2a0852b0-3740-11f0-97c8-7db8cf2e4435"),
+        xyz: (278.0, -128.0, 6.0),
+        sprite: None,
+        worldly: false,
+    ),
+    (
+        uid: (127),
+        instance: ("5b10f740-3740-11f0-97c8-5bb2b984318c"),
+        xyz: (296.0, -152.0, 6.0),
+        sprite: None,
+        worldly: false,
+    ),
 ])

@@ -3364,6 +3364,14 @@
                 )),
             ),
             (
+                xy: (304.0, 464.0),
+                index: 121,
+                sprite: Some((
+                    flip_x: false,
+                    flip_y: false,
+                )),
+            ),
+            (
                 xy: (432.0, 464.0),
                 index: 121,
                 sprite: Some((
