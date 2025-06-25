@@ -27,6 +27,7 @@ use crate::{GameState, HexColor, Layer, TILE_SIZE, world};
 
 mod bathroom;
 mod pills;
+mod tea;
 mod visitor;
 
 pub struct LevelPlugin;
@@ -37,6 +38,7 @@ impl Plugin for LevelPlugin {
             pills::PillsPlugin,
             visitor::VisitorPlugin,
             bathroom::BathroomPlugin,
+            tea::TeaPlugin,
         ))
         .register_required_components::<world::Teleport, Teleporter>()
         .register_required_components::<world::LunaDoor, VerticalDoor>()

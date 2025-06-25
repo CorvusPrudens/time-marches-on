@@ -15,7 +15,7 @@ use bevy_sequence::combinators::delay::run_after;
 use bevy_sequence::prelude::*;
 
 use crate::animation::{AnimationAppExt, AnimationSprite};
-use crate::audio::SpatialSound;
+use crate::audio::SpatialPool;
 use crate::cutscene::fragments::IntoBox;
 use crate::interactions::{Interactable, Interacted};
 use crate::player::{PLAYER_SPEED, Player, Scaled};
@@ -64,7 +64,7 @@ fn start(trigger: Trigger<OnAdd, Level>, levels: Query<&Level>, mut commands: Co
                     .looping()
                     .with_volume(Volume::Linear(0.9)),
                 Transform::from_xyz(1400., -2291., 0.),
-                SpatialSound,
+                SpatialPool,
             ));
         },
         &mut commands,
@@ -170,7 +170,7 @@ fn tree_talk(
 }
 
 fn tree_man_scene(commands: &mut Commands) {
-    tree_man()
+    crate::cutscenes::park_man::park_man_one()
         .on_end(|mut commands: Commands| {
             run_after(
                 Duration::from_secs(5),
@@ -196,7 +196,7 @@ fn tree_man_scene(commands: &mut Commands) {
                                     //volume: Volume::Linear(1.25),
                                     ..Default::default()
                                 },
-                                crate::audio::SpatialSound,
+                                crate::audio::SpatialPool,
                             ));
                     }
                 },
@@ -301,7 +301,8 @@ fn friendly_neighbor(commands: &mut Commands) {
         .on_end(
             |mut commands: Commands,
              door: Single<Entity, With<TheDoor>>,
-             server: Res<AssetServer>| {
+             server: Res<AssetServer>,
+             mut tea_state: ResMut<NextState<super::tea::TeaState>>| {
                 commands.entity(*door).insert((
                     DoorState::Closed,
                     crate::world::Interaction {
@@ -311,46 +312,10 @@ fn friendly_neighbor(commands: &mut Commands) {
                     },
                 ));
 
+                tea_state.set(super::tea::TeaState::TriggerReady);
+
                 commands.spawn(SamplePlayer::new(server.load("audio/sfx/door-close.wav")));
                 commands.run_system_cached(crate::despawn_entities::<With<NightSfx>>);
-
-                run_after(
-                    Duration::from_secs(5),
-                    |mut commands: Commands,
-                     server: Res<AssetServer>,
-                     cracked_door: Query<(Entity, &world::CrackedSideDoor1)>,
-                     side_door: Query<(Entity, &world::SideDoor1)>| {
-                        for (entity, _) in side_door
-                            .iter()
-                            .filter(|(_, door)| door.id as usize == 8392)
-                        {
-                            commands.entity(entity).despawn();
-                        }
-                        for (entity, _) in cracked_door
-                            .iter()
-                            .filter(|(_, door)| door.id as usize == 8392)
-                        {
-                            commands
-                                .entity(entity)
-                                .remove::<ColliderDisabled>()
-                                .insert((
-                                    Visibility::Visible,
-                                    // spatializing sound on door
-                                    PlaybackSettings {
-                                        on_complete: OnComplete::Remove,
-                                        ..Default::default()
-                                    },
-                                    SamplePlayer {
-                                        sample: server.load("audio/sfx/door-open.wav"),
-                                        //volume: Volume::Linear(1.25),
-                                        ..Default::default()
-                                    },
-                                    crate::audio::SpatialSound,
-                                ));
-                        }
-                    },
-                    &mut commands,
-                );
             },
         )
         .spawn_box(commands);

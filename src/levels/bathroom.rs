@@ -133,7 +133,7 @@ fn sturgeon(commands: &mut Commands) {
                                     //volume: Volume::Linear(1.25),
                                     ..Default::default()
                                 },
-                                crate::audio::SpatialSound,
+                                crate::audio::SpatialPool,
                             ));
                     }
 

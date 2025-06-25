@@ -48,9 +48,9 @@ pub enum CutsceneFragment {
     Pause(Duration),
 }
 
-impl From<u64> for CutsceneFragment {
-    fn from(value: u64) -> Self {
-        Self::Pause(Duration::from_millis(value))
+impl From<f32> for CutsceneFragment {
+    fn from(value: f32) -> Self {
+        Self::Pause(Duration::from_secs_f32(value))
     }
 }
 
@@ -94,4 +94,4 @@ macro_rules! impl_into_frag {
 impl_into_frag!(&'static str, slf, slf);
 impl_into_frag!(String, slf, slf);
 impl_into_frag!(Duration, slf, slf);
-impl_into_frag!(u64, slf, slf);
+impl_into_frag!(f32, slf, slf);
