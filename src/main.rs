@@ -167,6 +167,7 @@ pub enum Layer {
     #[default]
     Default,
     Player,
+    Other,
 }
 
 pub struct HexColor(pub u32);

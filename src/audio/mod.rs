@@ -38,13 +38,13 @@ impl Plugin for AudioPlugin {
                     sample_effects![VolumeNode::default()],
                 ));
 
-                commands.spawn((
-                    MusicPool,
-                    SamplePlayer::new(server.load("audio/music/quiet-halls.ogg"))
-                        // SamplePlayer::new(server.load("audio/music/luna.ogg"))
-                        .with_volume(Volume::Decibels(-6.0))
-                        .looping(),
-                ));
+                // commands.spawn((
+                //     MusicPool,
+                //     SamplePlayer::new(server.load("audio/music/quiet-halls.ogg"))
+                //         // SamplePlayer::new(server.load("audio/music/luna.ogg"))
+                //         .with_volume(Volume::Decibels(-6.0))
+                //         .looping(),
+                // ));
             },
         )
         .add_tween_systems((

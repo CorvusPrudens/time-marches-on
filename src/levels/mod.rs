@@ -22,7 +22,7 @@ use crate::callback::Callback;
 use crate::interactions::{InteractAction, Interactable};
 use crate::player::{InhibitAddEvent, InhibitRemoveEvent, Player, PlayerCollider};
 use crate::textbox::{TextBlurb, TextboxEvent};
-use crate::{GameState, HexColor, Layer, TILE_SIZE, world};
+use crate::{world, GameState, HexColor, Layer, TILE_SIZE};
 
 mod bathroom;
 mod pills;
@@ -402,7 +402,7 @@ fn load_ldtk(
     commands.spawn((
         bevy_ldtk_scene::HotWorld(server.load("ldtk/time-marches-on.ldtk")),
         bevy_ldtk_scene::World(server.load("ldtk/time-marches-on.ron")),
-        bevy_ldtk_scene::prelude::LevelLoader::levels(world::Level1),
+        bevy_ldtk_scene::prelude::LevelLoader::levels(world::Level2),
     ));
 }
 

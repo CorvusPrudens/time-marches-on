@@ -28,7 +28,12 @@ impl Plugin for PillsPlugin {
     }
 }
 
-fn start(trigger: Trigger<OnAdd, Level>, levels: Query<&Level>, mut commands: Commands) {
+fn start(
+    trigger: Trigger<OnAdd, Level>,
+    levels: Query<&Level>,
+    mut commands: Commands,
+    server: Res<AssetServer>,
+) {
     if !levels
         .get(trigger.target())
         .is_ok_and(|level| level.uid() == world::Level0.uid())
@@ -38,6 +43,14 @@ fn start(trigger: Trigger<OnAdd, Level>, levels: Query<&Level>, mut commands: Co
 
     commands.run_system_cached(crate::despawn_entities::<With<PillState>>);
     commands.spawn(PillState(0));
+
+    commands.spawn((
+        crate::audio::MusicPool,
+        SamplePlayer::new(server.load("audio/music/quiet-halls.ogg"))
+            // SamplePlayer::new(server.load("audio/music/luna.ogg"))
+            .with_volume(Volume::Decibels(-6.0))
+            .looping(),
+    ));
 
     run_after(
         Duration::from_secs(2),

@@ -101,3 +101,20 @@ fn fade_out_music(
         );
     }
 }
+
+pub fn fade_in_music(
+    seconds: f32,
+) -> impl Fn(Single<Entity, With<SamplerPool<MusicPool>>>, Commands) {
+    move |music: Single<Entity, With<SamplerPool<MusicPool>>>, mut commands: Commands| {
+        let music = music.into_inner();
+
+        let duration = Duration::from_secs_f32(seconds);
+
+        let mut target = music.into_target().state(-48.0);
+        commands.animation().insert(tween(
+            duration,
+            EaseKind::Linear,
+            target.with(crate::audio::tween::volume_to(0.0)),
+        ));
+    }
+}
