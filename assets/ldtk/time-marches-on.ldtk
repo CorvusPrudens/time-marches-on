@@ -5288,6 +5288,22 @@
 							}] }],
 							"__worldX": 1432,
 							"__worldY": 1650
+						},
+						{
+							"__identifier": "PlayerVessel",
+							"__grid": [12,28],
+							"__pivot": [0.5,0.5],
+							"__tags": ["worldly"],
+							"__tile": { "tilesetUid": 1, "x": 0, "y": 16, "w": 16, "h": 32 },
+							"__smartColor": "#D77643",
+							"iid": "9cd1df10-3740-11f0-938a-81679c60b79f",
+							"width": 16,
+							"height": 32,
+							"defUid": 7,
+							"px": [200,456],
+							"fieldInstances": [],
+							"__worldX": 1272,
+							"__worldY": 1272
 						}
 					]
 				},
@@ -27847,22 +27863,6 @@
 							"fieldInstances": [{ "__identifier": "Target", "__type": "Point", "__value": null, "__tile": null, "defUid": 85, "realEditorValues": [] }],
 							"__worldX": 1258,
 							"__worldY": 3310
-						},
-						{
-							"__identifier": "PlayerVessel",
-							"__grid": [50,9],
-							"__pivot": [0.5,0.5],
-							"__tags": ["worldly"],
-							"__tile": { "tilesetUid": 1, "x": 0, "y": 16, "w": 16, "h": 32 },
-							"__smartColor": "#D77643",
-							"iid": "b2582a10-3740-11f0-938a-55cd6964a577",
-							"width": 16,
-							"height": 32,
-							"defUid": 7,
-							"px": [808,152],
-							"fieldInstances": [],
-							"__worldX": 1880,
-							"__worldY": 3000
 						},
 						{
 							"__identifier": "Scribble",
