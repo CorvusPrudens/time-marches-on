@@ -9,6 +9,7 @@ use bevy_ldtk_scene::levels::Level;
 use bevy_ldtk_scene::prelude::LevelMetaExt;
 use bevy_light_2d::light::{AmbientLight2d, PointLight2d};
 use bevy_optix::camera::MainCamera;
+use bevy_optix::zorder::YOrigin;
 use bevy_seedling::prelude::Volume;
 use bevy_seedling::prelude::*;
 use bevy_seedling::sample::{PlaybackSettings, SamplePlayer};
@@ -19,13 +20,14 @@ use bevy_tween::tween::IntoTarget;
 use bevy_tween::{BevyTweenRegisterSystems, component_tween_system};
 use rand::Rng;
 
+use crate::animation::{AnimationAppExt, AnimationSprite};
 use crate::audio::{MusicPool, SpatialPool};
 use crate::cutscene::fragments::IntoBox;
 use crate::cutscenes::tea::fade_in_music;
 use crate::interactions::Interacted;
 use crate::inventory::item::{InventoryItem, ItemPickupEvent};
 use crate::player::Player;
-use crate::{Avian, Layer, world};
+use crate::{Avian, world};
 
 use super::{DoorDisabled, in_level};
 
@@ -33,19 +35,23 @@ pub struct BathroomPlugin;
 
 impl Plugin for BathroomPlugin {
     fn build(&self, app: &mut App) {
-        app.register_required_components::<world::Scribble, Scribble>()
-            .add_tween_systems((
-                component_tween_system::<AmbientLightTween>(),
-                component_tween_system::<PointLight2dTween>(),
-            ))
-            .add_systems(
-                Update,
-                disable_bathroom_door.run_if(in_level(world::Level2.uid())),
-            )
-            .init_resource::<ScribbleDialogStep>()
-            .add_systems(Avian, move_scribble)
-            .add_observer(start)
-            .add_observer(observe_scribbles);
+        app.register_layout(
+            "textures/scribble.png",
+            TextureAtlasLayout::from_grid(UVec2::splat(48), 4, 1, None, None),
+        )
+        .register_required_components::<world::Scribble, Scribble>()
+        .add_tween_systems((
+            component_tween_system::<AmbientLightTween>(),
+            component_tween_system::<PointLight2dTween>(),
+        ))
+        .add_systems(
+            Update,
+            disable_bathroom_door.run_if(in_level(world::Level2.uid())),
+        )
+        .init_resource::<ScribbleDialogStep>()
+        .add_systems(Avian, move_scribble)
+        .add_observer(start)
+        .add_observer(observe_scribbles);
     }
 }
 
@@ -196,11 +202,10 @@ pub struct Exhausted;
 
 #[derive(Component, Default)]
 #[require(
-    Collider::rectangle(16.0, 16.0),
-    // RigidBody::Dynamic,
-    // CollisionLayers::new(Layer::Default, Layer::Default),
+    Collider::rectangle(24.0, 32.0),
+    YOrigin(-12.),
     LockedAxes::ROTATION_LOCKED,
-            Sensor,
+    Sensor,
     crate::interactions::Interactable
 )]
 #[component(on_insert = Self::on_insert_hook)]
@@ -212,6 +217,7 @@ impl Scribble {
             world.run_system_once(move |mut commands: Commands, server: Res<AssetServer>| {
                 let mut rng = rand::thread_rng();
                 commands.entity(context.entity).insert((
+                    AnimationSprite::repeating("textures/scribble.png", 0.2, 0..4),
                     SpatialPool,
                     SamplePlayer::new(server.load("audio/sfx/solo-whispers.ogg"))
                         .looping()
@@ -225,13 +231,6 @@ impl Scribble {
                 ));
             })
         });
-
-        // world.commands().entity(context.entity).with_child((
-        //     Collider::rectangle(16.0, 16.0),
-        //     Transform::default(),
-        //     Sensor,
-        //     CollisionLayers::new(Layer::Default, [Layer::Player]),
-        // ));
     }
 }
 
