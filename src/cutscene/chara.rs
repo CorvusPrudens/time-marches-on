@@ -9,7 +9,8 @@ use crate::textbox::{CharacterEvent, CharacterSprite, glyph_sample};
 #[derive(Clone, Copy)]
 pub enum Chara {
     Narrator,
-    DistressedNarrator,
+    DistressedNarrator1,
+    DistressedNarrator2,
     Father,
     Luna,
     Stranger,
@@ -21,7 +22,8 @@ impl Chara {
     pub fn sprite(&self) -> Option<CharacterSprite> {
         match self {
             Self::Narrator => None,
-            Self::DistressedNarrator => None,
+            Self::DistressedNarrator1 => None,
+            Self::DistressedNarrator2 => None,
             Self::Father => Some(CharacterSprite::new("main.png")),
             Self::Luna => Some(CharacterSprite::new("luna.png")),
             Self::Stranger => None,
@@ -42,12 +44,22 @@ impl Chara {
                     },
                 ));
             }),
-            Self::DistressedNarrator => Arc::new(move |commands, server| {
+            Self::DistressedNarrator1 => Arc::new(move |commands, server| {
                 commands.spawn((
-                    PitchRange::new(0.1),
+                    PitchRange(1.0..1.15),
                     SamplePlayer {
-                        sample: server.load(glyph_sample("medium.wav")),
-                        volume: Volume::Linear(0.3),
+                        sample: server.load(glyph_sample("low.wav")),
+                        volume: Volume::Linear(0.6),
+                        ..Default::default()
+                    },
+                ));
+            }),
+            Self::DistressedNarrator2 => Arc::new(move |commands, server| {
+                commands.spawn((
+                    PitchRange(1.0..1.30),
+                    SamplePlayer {
+                        sample: server.load(glyph_sample("low.wav")),
+                        volume: Volume::Linear(0.7),
                         ..Default::default()
                     },
                 ));
@@ -114,7 +126,11 @@ where
     }
 
     fn distressed_narrator(self) -> impl IntoBox<C> {
-        self.chara(Chara::DistressedNarrator)
+        self.chara(Chara::DistressedNarrator1)
+    }
+
+    fn distressed_narrator2(self) -> impl IntoBox<C> {
+        self.chara(Chara::DistressedNarrator2)
     }
 
     fn father(self) -> impl IntoBox<C> {

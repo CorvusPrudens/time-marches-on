@@ -1,5 +1,6 @@
 use crate::{
     animation::AnimationSprite,
+    audio::MusicPool,
     cutscene::{
         chara::{Chara, Character},
         fragments::IntoBox,
@@ -66,7 +67,20 @@ pub fn shadow_9() -> impl IntoBox {
 
 pub fn final_cutscene() -> impl IntoBox {
     (
-        "Pill are scattered across the floor.".narrator(),
+        "Pill are scattered across the floor.".narrator().on_end(
+            |mut commands: Commands, server: Res<AssetServer>| {
+                commands.spawn((
+                    MusicPool,
+                    SamplePlayer::new(server.load("audio/music/luna.ogg"))
+                        .looping()
+                        .with_volume(Volume::Decibels(-8.0)),
+                    PlaybackSettings {
+                        speed: 0.5,
+                        ..Default::default()
+                    },
+                ));
+            },
+        ),
         1.0,
         "Luna?".father(),
         "Honey, what's going on?".father(),
@@ -76,15 +90,26 @@ pub fn final_cutscene() -> impl IntoBox {
         "Luna, I'm scared.".father(),
         2.0,
         "She doesn't move.".narrator(),
-        "She's not waking up.".distressed_narrator(),
-        "She's not...".distressed_narrator(),
+        "She's not waking up.".narrator(),
+        "She's not...".narrator(),
         2.0,
-        "She's not breathing.".distressed_narrator(),
-        5.0,
-        "Get out of here.".distressed_narrator(),
-        "Lock the door.".distressed_narrator(),
-        "please...".distressed_narrator().on_start(
-            |mut commands: Commands, server: Res<AssetServer>| {
+        "She's not breathing."
+            .distressed_narrator()
+            .on_start(lower_pitch),
+        4.0,
+        "get out of here"
+            .distressed_narrator()
+            .on_start(lower_pitch),
+        "lock the door".distressed_narrator2().on_start(lower_pitch),
+        "please...".distressed_narrator2().on_start(lower_pitch),
+        2.0,
+        "just... forget about this"
+            .distressed_narrator2()
+            .on_start(lower_pitch),
+        "like you forget everything else"
+            .distressed_narrator2()
+            .on_start(lower_pitch)
+            .on_start(|mut commands: Commands, server: Res<AssetServer>| {
                 let overlay = commands
                     .spawn((
                         crate::hook::Hook,
@@ -142,18 +167,18 @@ pub fn final_cutscene() -> impl IntoBox {
                 );
 
                 run_after(
-                    Duration::from_secs(9),
+                    Duration::from_secs(10),
                     |mut writer: EventWriter<AppExit>| {
                         writer.write_default();
                     },
                     &mut commands,
                 );
-            },
-        ),
-        2.0,
-        "just... forget about this".distressed_narrator(),
-        "like you forget everything else".distressed_narrator(),
+            }),
     )
         .always()
         .once()
+}
+
+fn lower_pitch(mut music: Single<&mut PlaybackSettings, With<MusicPool>>) {
+    music.speed *= 0.95;
 }

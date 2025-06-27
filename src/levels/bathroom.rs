@@ -55,6 +55,7 @@ impl Plugin for BathroomPlugin {
         .add_systems(Avian, move_scribble)
         .add_observer(start)
         .add_observer(observe_scribbles)
+        .add_observer(observe_door)
         .add_observer(observe_bed);
     }
 }
@@ -72,7 +73,7 @@ fn start(
         return;
     }
 
-    let lights_duration = Duration::from_secs(2);
+    let lights_duration = Duration::from_secs(10);
 
     commands
         .entity(*camera)
@@ -352,9 +353,6 @@ fn observe_scribbles(
 
                         writer.write(ItemPickupEvent(item));
 
-                        commands
-                            .queue(|world: &mut World| world.run_system_once(fade_out_music(0.1)));
-
                         commands.entity(*door).remove::<ColliderDisabled>();
                     },
                 )
@@ -370,6 +368,18 @@ fn observe_scribbles(
 #[derive(Component, Default)]
 #[require(ColliderDisabled, Collider::rectangle(16.0, 32.0), Interactable)]
 pub struct LunaDoor;
+
+fn observe_door(
+    trigger: Trigger<OnAdd, Interacted>,
+    door: Query<(), With<LunaDoor>>,
+    mut commands: Commands,
+) {
+    if door.get(trigger.target()).is_err() {
+        return;
+    }
+
+    commands.queue(|world: &mut World| world.run_system_once(fade_out_music(0.1)));
+}
 
 #[derive(Component, Default)]
 #[require(Collider::rectangle(32.0, 64.0), Interactable)]
