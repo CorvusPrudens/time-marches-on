@@ -1,12 +1,14 @@
 use std::time::Duration;
 
 use crate::{
+    animation::AnimationSprite,
     cutscene::fragments::IntoBox,
     interactions::{Interactable, Interacted},
     world,
 };
 use avian2d::prelude::*;
 use bevy::prelude::*;
+use bevy_optix::zorder::YOrigin;
 use bevy_seedling::prelude::*;
 use bevy_sequence::{combinators::delay::run_after, prelude::FragmentExt};
 
@@ -16,6 +18,7 @@ impl Plugin for TeaPlugin {
     fn build(&self, app: &mut App) {
         app.register_required_components::<world::TeaSpawner, TeaSpawner>()
             .register_required_components::<world::TeaTable, TeaTable>()
+            .register_required_components_with::<world::Table, _>(|| YOrigin(-8.))
             .init_state::<TeaState>()
             .add_systems(OnEnter(TeaState::TriggerReady), ready_trigger)
             .add_systems(OnEnter(TeaState::SpawnLuna), spawn_tea)
@@ -81,6 +84,12 @@ fn spawn_tea(
 ) -> Result {
     let (_, luna_transform) = luna.single()?;
     let table = table.single()?;
+
+    commands.spawn((
+        AnimationSprite::repeating("textures/luna.png", 0.0, [50]),
+        (*luna_transform * GlobalTransform::from_xyz(8., -8., 0.)).compute_transform(),
+        YOrigin(-14.),
+    ));
 
     commands
         .entity(table)
