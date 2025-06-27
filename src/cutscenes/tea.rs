@@ -70,7 +70,7 @@ pub fn tea_cutscene() -> impl IntoBox<TeaCutscene> {
         .once()
 }
 
-fn fade_out_music(
+pub fn fade_out_music(
     seconds: f32,
 ) -> impl Fn(Single<(Entity, &VolumeNode), With<SamplerPool<MusicPool>>>, Commands) {
     move |music: Single<(Entity, &VolumeNode), With<SamplerPool<MusicPool>>>,

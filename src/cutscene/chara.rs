@@ -9,6 +9,7 @@ use crate::textbox::{CharacterEvent, CharacterSprite, glyph_sample};
 #[derive(Clone, Copy)]
 pub enum Chara {
     Narrator,
+    DistressedNarrator,
     Father,
     Luna,
     Stranger,
@@ -20,6 +21,7 @@ impl Chara {
     pub fn sprite(&self) -> Option<CharacterSprite> {
         match self {
             Self::Narrator => None,
+            Self::DistressedNarrator => None,
             Self::Father => Some(CharacterSprite::new("main.png")),
             Self::Luna => Some(CharacterSprite::new("luna.png")),
             Self::Stranger => None,
@@ -36,6 +38,16 @@ impl Chara {
                     SamplePlayer {
                         sample: server.load(glyph_sample("low.wav")),
                         volume: Volume::Linear(0.5),
+                        ..Default::default()
+                    },
+                ));
+            }),
+            Self::DistressedNarrator => Arc::new(move |commands, server| {
+                commands.spawn((
+                    PitchRange::new(0.1),
+                    SamplePlayer {
+                        sample: server.load(glyph_sample("medium.wav")),
+                        volume: Volume::Linear(0.3),
                         ..Default::default()
                     },
                 ));
@@ -99,6 +111,10 @@ where
 
     fn narrator(self) -> impl IntoBox<C> {
         self.chara(Chara::Narrator)
+    }
+
+    fn distressed_narrator(self) -> impl IntoBox<C> {
+        self.chara(Chara::DistressedNarrator)
     }
 
     fn father(self) -> impl IntoBox<C> {

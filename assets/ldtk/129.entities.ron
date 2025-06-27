@@ -626,4 +626,26 @@
         sprite: None,
         worldly: false,
     ),
+    (
+        uid: (136),
+        instance: ("0d0a18b0-3740-11f0-938a-45602f85b59a"),
+        xyz: (1784.0, -384.0, 6.0),
+        sprite: Some((
+            image: "ldtk/../textures/furniture.png",
+            tileset: (59),
+            atlas: Rect((
+                min: (176.0, 768.0),
+                max: (192.0, 784.0),
+            )),
+            pivot: (0.5, 0.5),
+        )),
+        worldly: false,
+    ),
+    (
+        uid: (137),
+        instance: ("c2141300-3740-11f0-938a-c3d8a4c71aa3"),
+        xyz: (1728.0, -311.0, 6.0),
+        sprite: None,
+        worldly: false,
+    ),
 ])

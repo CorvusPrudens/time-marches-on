@@ -31,7 +31,7 @@ impl Plugin for HookPlugin {
 }
 
 #[derive(Component)]
-struct Hook;
+pub struct Hook;
 
 fn spawn(mut commands: Commands, server: Res<AssetServer>) {
     commands.spawn((

@@ -21,11 +21,12 @@ use rand::Rng;
 
 use crate::audio::{MusicPool, SpatialPool};
 use crate::cutscene::fragments::IntoBox;
-use crate::cutscenes::tea::fade_in_music;
-use crate::interactions::Interacted;
+use crate::cutscenes::dark_home::final_cutscene;
+use crate::cutscenes::tea::{fade_in_music, fade_out_music};
+use crate::interactions::{Interactable, Interacted};
 use crate::inventory::item::{InventoryItem, ItemPickupEvent};
 use crate::player::Player;
-use crate::{Avian, Layer, world};
+use crate::{Avian, world};
 
 use super::{DoorDisabled, in_level};
 
@@ -34,6 +35,8 @@ pub struct BathroomPlugin;
 impl Plugin for BathroomPlugin {
     fn build(&self, app: &mut App) {
         app.register_required_components::<world::Scribble, Scribble>()
+            .register_required_components::<world::LunaDoor, LunaDoor>()
+            .register_required_components::<world::BedEntity, BedEntity>()
             .add_tween_systems((
                 component_tween_system::<AmbientLightTween>(),
                 component_tween_system::<PointLight2dTween>(),
@@ -45,7 +48,8 @@ impl Plugin for BathroomPlugin {
             .init_resource::<ScribbleDialogStep>()
             .add_systems(Avian, move_scribble)
             .add_observer(start)
-            .add_observer(observe_scribbles);
+            .add_observer(observe_scribbles)
+            .add_observer(observe_bed);
     }
 }
 
@@ -337,7 +341,9 @@ fn observe_scribbles(
         8 => {
             shadow_9()
                 .on_end(
-                    |mut commands: Commands, mut writer: EventWriter<ItemPickupEvent>| {
+                    |mut commands: Commands,
+                     mut writer: EventWriter<ItemPickupEvent>,
+                     door: Single<Entity, With<LunaDoor>>| {
                         let item = commands
                             .spawn((InventoryItem {
                                 name: "Key".into(),
@@ -346,6 +352,11 @@ fn observe_scribbles(
                             .id();
 
                         writer.write(ItemPickupEvent(item));
+
+                        commands
+                            .queue(|world: &mut World| world.run_system_once(fade_out_music(0.1)));
+
+                        commands.entity(*door).remove::<ColliderDisabled>();
                     },
                 )
                 .spawn_box(&mut commands);
@@ -355,4 +366,24 @@ fn observe_scribbles(
         }
         _ => {}
     }
+}
+
+#[derive(Component, Default)]
+#[require(ColliderDisabled, Collider::rectangle(16.0, 32.0), Interactable)]
+pub struct LunaDoor;
+
+#[derive(Component, Default)]
+#[require(Collider::rectangle(32.0, 64.0), Interactable)]
+pub struct BedEntity;
+
+fn observe_bed(
+    trigger: Trigger<OnAdd, Interacted>,
+    bed: Query<(), With<BedEntity>>,
+    mut commands: Commands,
+) {
+    if bed.get(trigger.target()).is_err() {
+        return;
+    }
+
+    final_cutscene().spawn_box(&mut commands);
 }
