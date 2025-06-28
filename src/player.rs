@@ -92,10 +92,6 @@ fn observe_remove_inhibit<C: InputContext>(
     }
 }
 
-pub fn remove_actions(mut commands: Commands, player: Single<Entity, With<Player>>) {
-    commands.entity(*player).remove::<Actions<PlayerContext>>();
-}
-
 pub fn add_actions(mut commands: Commands, player: Single<Entity, With<Player>>) {
     commands
         .entity(*player)

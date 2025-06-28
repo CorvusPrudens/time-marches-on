@@ -13,7 +13,7 @@ pub fn park() -> impl IntoBox<ParkCutscene> {
 
 pub fn park_man_one() -> impl IntoBox<ParkCutscene> {
     (
-        "There's a man behind the tree.",
+        "There's a man behind the tree.".narrator(),
         1.0,
         "Hello.".stranger(),
         "Good evening, young man.".father(),

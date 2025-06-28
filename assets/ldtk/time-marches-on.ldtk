@@ -5059,11 +5059,8 @@
 							"defUid": 83,
 							"px": [1127,1279],
 							"fieldInstances": [
-								{ "__identifier": "Target", "__type": "Point", "__value": { "cx": 12, "cy": 72 }, "__tile": null, "defUid": 86, "realEditorValues": [{
-									"id": "V_String",
-									"params": ["12,72"]
-								}] },
-								{ "__identifier": "id", "__type": "Int", "__value": 69, "__tile": null, "defUid": 108, "realEditorValues": [{ "id": "V_Int", "params": [69] }] }
+								{ "__identifier": "Target", "__type": "Point", "__value": null, "__tile": null, "defUid": 86, "realEditorValues": [null] },
+								{ "__identifier": "id", "__type": "Int", "__value": 2001, "__tile": null, "defUid": 108, "realEditorValues": [{ "id": "V_Int", "params": [2001] }] }
 							],
 							"__worldX": 2199,
 							"__worldY": 2095

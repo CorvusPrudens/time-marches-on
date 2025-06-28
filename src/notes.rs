@@ -10,7 +10,7 @@ use bevy_tween::interpolate::{sprite_color, translation};
 use bevy_tween::prelude::{AnimationBuilderExt, EaseKind};
 use bevy_tween::tween::IntoTarget;
 
-use crate::player::{self, InhibitAddEvent, Player, PlayerContext};
+use crate::player::{self, InhibitAddEvent, InhibitRemoveEvent, Player, PlayerContext};
 use crate::textbox::{Interact, TextboxContext};
 
 pub struct NotesPlugin;
@@ -153,7 +153,9 @@ fn exit(
     );
     run_after(
         Duration::from_secs_f32(SLIDE_DUR.max(FADE_DUR)),
-        player::add_actions,
+        move |mut commands: Commands, player: Single<Entity, With<Player>>| {
+            commands.entity(*player).trigger(InhibitRemoveEvent);
+        },
         &mut commands,
     );
 }

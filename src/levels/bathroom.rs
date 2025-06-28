@@ -87,6 +87,8 @@ fn start(
                 .with(AmbientLightTween { start: 1., end: 0. }),
         );
 
+    commands.queue(|world: &mut World| world.run_system_once(fade_out_music(0.1)));
+
     run_after(
         lights_duration + Duration::from_secs(3),
         |mut commands: Commands, server: Res<AssetServer>| {
@@ -296,23 +298,20 @@ fn observe_scribbles(
                         .iter()
                         .filter(|(_, door)| door.id as usize == 8392)
                     {
-                        commands
-                            .entity(entity)
-                            .remove::<ColliderDisabled>()
-                            .insert((
-                                Visibility::Visible,
-                                // spatializing sound on door
-                                PlaybackSettings {
-                                    on_complete: OnComplete::Remove,
-                                    ..Default::default()
-                                },
-                                SamplePlayer {
-                                    sample: server.load("audio/sfx/door-open.wav"),
-                                    //volume: Volume::Linear(1.25),
-                                    ..Default::default()
-                                },
-                                crate::audio::SpatialPool,
-                            ));
+                        commands.entity(entity).remove::<DoorDisabled>().insert((
+                            Visibility::Visible,
+                            // spatializing sound on door
+                            PlaybackSettings {
+                                on_complete: OnComplete::Remove,
+                                ..Default::default()
+                            },
+                            SamplePlayer {
+                                sample: server.load("audio/sfx/door-open.wav"),
+                                //volume: Volume::Linear(1.25),
+                                ..Default::default()
+                            },
+                            crate::audio::SpatialPool,
+                        ));
                     }
                 },
                 &mut commands,
@@ -353,7 +352,7 @@ fn observe_scribbles(
 
                         writer.write(ItemPickupEvent(item));
 
-                        commands.entity(*door).remove::<ColliderDisabled>();
+                        commands.entity(*door).remove::<DoorDisabled>();
                     },
                 )
                 .spawn_box(&mut commands);
@@ -366,7 +365,7 @@ fn observe_scribbles(
 }
 
 #[derive(Component, Default)]
-#[require(ColliderDisabled, Collider::rectangle(16.0, 32.0), Interactable)]
+#[require(DoorDisabled, Collider::rectangle(16.0, 32.0), Interactable)]
 pub struct LunaDoor;
 
 fn observe_door(

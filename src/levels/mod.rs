@@ -223,25 +223,31 @@ struct VerticalDoor;
 )]
 struct Door;
 
-#[derive(Default, Component)]
+#[derive(Component, Default)]
 pub struct DoorDisabled;
 
 fn door(
     _: Trigger<Fired<InteractAction>>,
 
-    luna_door: Query<(&world::LunaDoor, &CollidingEntities, &ChildOf)>,
-    hall_doors1: Query<(&world::HallDoor1, &CollidingEntities, &ChildOf)>,
-    hall_doors2: Query<(&world::FrontDoor, &CollidingEntities, &ChildOf)>,
-    side_doors1: Query<(&world::SideDoor1, &CollidingEntities, &ChildOf)>,
-    side_doors2: Query<(&world::SideDoor2, &CollidingEntities, &ChildOf)>,
-    bathroom_door1: Query<(&world::BathroomDoor, &CollidingEntities, &ChildOf)>,
+    luna_door: Query<(&world::LunaDoor, &CollidingEntities, &ChildOf), Without<DoorDisabled>>,
+    hall_doors1: Query<(&world::HallDoor1, &CollidingEntities, &ChildOf), Without<DoorDisabled>>,
+    hall_doors2: Query<(&world::FrontDoor, &CollidingEntities, &ChildOf), Without<DoorDisabled>>,
+    side_doors1: Query<(&world::SideDoor1, &CollidingEntities, &ChildOf), Without<DoorDisabled>>,
+    side_doors2: Query<(&world::SideDoor2, &CollidingEntities, &ChildOf), Without<DoorDisabled>>,
+    bathroom_door1: Query<
+        (&world::BathroomDoor, &CollidingEntities, &ChildOf),
+        Without<DoorDisabled>,
+    >,
     bathroom_door2: Query<(
         &world::BathroomExitDoor,
         &CollidingEntities,
         &ChildOf,
         Option<&DoorDisabled>,
     )>,
-    cracked_side_door1: Query<(&world::CrackedSideDoor1, &CollidingEntities, &ChildOf)>,
+    cracked_side_door1: Query<
+        (&world::CrackedSideDoor1, &CollidingEntities, &ChildOf),
+        Without<DoorDisabled>,
+    >,
 
     player: Single<(Entity, &mut Transform), With<Player>>,
     player_collider: Single<Entity, With<PlayerCollider>>,
@@ -274,11 +280,19 @@ fn door(
                 .iter()
                 .map(|(door, colliding, child_of)| (door.target, colliding, child_of, true, "")),
         )
-        .chain(
-            side_doors1
-                .iter()
-                .map(|(door, colliding, child_of)| (door.target, colliding, child_of, false, "")),
-        )
+        .chain(side_doors1.iter().map(|(door, colliding, child_of)| {
+            if door.id == 2001 {
+                (
+                    Some(Vec2::new(12.0, 111.0)),
+                    colliding,
+                    child_of,
+                    false,
+                    "level1",
+                )
+            } else {
+                (door.target, colliding, child_of, false, "")
+            }
+        }))
         .chain(
             side_doors2
                 .iter()
@@ -330,6 +344,8 @@ fn door(
                 .then_some((target, child_of, luna, load))
         })
     {
+        info!("{target:?}, {child_of:?}, {luna:?}, {load}");
+
         if !load.is_empty() {
             match load {
                 "level1" => {

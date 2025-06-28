@@ -21,6 +21,8 @@ use crate::interactions::{Interactable, Interacted};
 use crate::player::{PLAYER_SPEED, Player, Scaled};
 use crate::{Layer, world};
 
+use super::DoorDisabled;
+
 pub struct VisitorPlugin;
 
 impl Plugin for VisitorPlugin {
@@ -192,23 +194,20 @@ fn tree_man_scene(commands: &mut Commands) {
                         .iter()
                         .filter(|(_, door)| door.id as usize == 222)
                     {
-                        commands
-                            .entity(entity)
-                            .remove::<ColliderDisabled>()
-                            .insert((
-                                Visibility::Visible,
-                                // spatializing sound on door
-                                PlaybackSettings {
-                                    on_complete: OnComplete::Remove,
-                                    ..Default::default()
-                                },
-                                SamplePlayer {
-                                    sample: server.load("audio/sfx/door-open.wav"),
-                                    //volume: Volume::Linear(1.25),
-                                    ..Default::default()
-                                },
-                                crate::audio::SpatialPool,
-                            ));
+                        commands.entity(entity).remove::<DoorDisabled>().insert((
+                            Visibility::Visible,
+                            // spatializing sound on door
+                            PlaybackSettings {
+                                on_complete: OnComplete::Remove,
+                                ..Default::default()
+                            },
+                            SamplePlayer {
+                                sample: server.load("audio/sfx/door-open.wav"),
+                                //volume: Volume::Linear(1.25),
+                                ..Default::default()
+                            },
+                            crate::audio::SpatialPool,
+                        ));
                     }
                 },
                 &mut commands,

@@ -10,6 +10,7 @@ use bevy_sequence::combinators::delay::run_after;
 
 use crate::interactions::{Interactable, Interacted};
 use crate::inventory::item::{InventoryItem, ItemPickupEvent};
+use crate::levels::DoorDisabled;
 use crate::notes::NoteEvent;
 use crate::textbox::{TextBlurb, TextboxEvent};
 use crate::world::SideDoor1;
@@ -65,14 +66,15 @@ fn start(
 struct PillState(usize);
 
 #[derive(Default, Component)]
-#[require(Visibility::Hidden, ColliderDisabled, YOrigin(-12.))]
+#[require(Visibility::Hidden, DoorDisabled, YOrigin(-12.))]
 struct CrackedDoor;
 
 #[derive(Default, Component)]
 #[require(
     Interactable,
     Collider::rectangle(24., 48.),
-    CollisionLayers::new(Layer::Default, Layer::Player)
+    CollisionLayers::new(Layer::Default, Layer::Player),
+    YOrigin(-18.0)
 )]
 struct Pills;
 
@@ -170,24 +172,23 @@ fn trash(
                 .iter()
                 .filter(|(_, door)| door.id as usize == id.0)
             {
-                commands
-                    .entity(entity)
-                    .remove::<ColliderDisabled>()
-                    .insert((
-                        Visibility::Visible,
-                        // spatializing sound on door
-                        PlaybackSettings {
-                            on_complete: OnComplete::Remove,
-                            ..Default::default()
-                        },
-                        SamplePlayer {
-                            sample: server.load("audio/sfx/door-open.wav"),
-                            //volume: Volume::Linear(1.25),
-                            ..Default::default()
-                        },
-                        crate::audio::SpatialPool,
-                    ));
+                commands.entity(entity).remove::<DoorDisabled>().insert((
+                    Visibility::Visible,
+                    // spatializing sound on door
+                    PlaybackSettings {
+                        on_complete: OnComplete::Remove,
+                        ..Default::default()
+                    },
+                    SamplePlayer {
+                        sample: server.load("audio/sfx/door-open.wav"),
+                        //volume: Volume::Linear(1.25),
+                        ..Default::default()
+                    },
+                    crate::audio::SpatialPool,
+                ));
             }
+
+            info!("id: {}", id.0);
 
             id.0 += 1;
         },

@@ -12,6 +12,8 @@ use bevy_optix::zorder::YOrigin;
 use bevy_seedling::prelude::*;
 use bevy_sequence::{combinators::delay::run_after, prelude::FragmentExt};
 
+use super::DoorDisabled;
+
 pub struct TeaPlugin;
 
 impl Plugin for TeaPlugin {
@@ -125,23 +127,20 @@ fn watch_table(trigger: Trigger<OnAdd, Interacted>, mut commands: Commands) {
                             .iter()
                             .filter(|(_, door)| door.id as usize == 8392)
                         {
-                            commands
-                                .entity(entity)
-                                .remove::<ColliderDisabled>()
-                                .insert((
-                                    Visibility::Visible,
-                                    // spatializing sound on door
-                                    PlaybackSettings {
-                                        on_complete: OnComplete::Remove,
-                                        ..Default::default()
-                                    },
-                                    SamplePlayer {
-                                        sample: server.load("audio/sfx/door-open.wav"),
-                                        //volume: Volume::Linear(1.25),
-                                        ..Default::default()
-                                    },
-                                    crate::audio::SpatialPool,
-                                ));
+                            commands.entity(entity).remove::<DoorDisabled>().insert((
+                                Visibility::Visible,
+                                // spatializing sound on door
+                                PlaybackSettings {
+                                    on_complete: OnComplete::Remove,
+                                    ..Default::default()
+                                },
+                                SamplePlayer {
+                                    sample: server.load("audio/sfx/door-open.wav"),
+                                    //volume: Volume::Linear(1.25),
+                                    ..Default::default()
+                                },
+                                crate::audio::SpatialPool,
+                            ));
                         }
                     },
                     &mut commands,
