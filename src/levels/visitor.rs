@@ -307,8 +307,7 @@ fn friendly_neighbor(commands: &mut Commands) {
         .on_end(
             |mut commands: Commands,
              door: Single<Entity, With<TheDoor>>,
-             server: Res<AssetServer>,
-             mut tea_state: ResMut<NextState<super::tea::TeaState>>| {
+             server: Res<AssetServer>| {
                 commands.entity(*door).insert((
                     DoorState::Closed,
                     crate::world::Interaction {
@@ -318,7 +317,7 @@ fn friendly_neighbor(commands: &mut Commands) {
                     },
                 ));
 
-                tea_state.set(super::tea::TeaState::TriggerReady);
+                spawn_root(super::tea::tea_sequence(), &mut commands);
 
                 commands.spawn(SamplePlayer::new(server.load("audio/sfx/door-close.wav")));
                 commands.run_system_cached(crate::despawn_entities::<With<NightSfx>>);

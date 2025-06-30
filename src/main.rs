@@ -30,6 +30,7 @@ mod loading;
 mod menu;
 mod notes;
 mod player;
+mod sequence;
 mod textbox;
 #[allow(unused)]
 mod world;
@@ -104,6 +105,7 @@ fn main() {
         cutscenes::CutscenePlugin,
         notes::NotesPlugin,
         audio::AudioPlugin,
+        sequence::ObserverSequencePlugin,
     ))
     .init_state::<GameState>()
     .add_sub_state::<PlayingState>()
